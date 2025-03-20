@@ -90,91 +90,91 @@ function TutorCard({ tutor }) {
 
   return (
     <motion.div
-      className="bg-[#b8a6c9] rounded-lg overflow-hidden"
+      className="bg-[#b8a6c9] rounded-lg overflow-hidden mb-[100px]"
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
       <div className="flex flex-col md:flex-row">
-        <div className="md:w-1/3">
-          <img
-            src={tutor.image || "/placeholder.svg"}
-            alt={tutor.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="md:w-2/3 p-6">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-            }}
+      <div className="md:w-1/3">
+        <img
+        src={tutor.image || "/placeholder.svg"}
+        alt={tutor.name}
+        className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="md:w-2/3 p-6">
+        <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+        }}
+        >
+        <motion.h3
+          className="text-2xl font-bold mb-1"
+          variants={textVariants}
+        >
+          {tutor.name}
+        </motion.h3>
+        {tutor.linkedinUrl && (
+          <motion.a
+          href={tutor.linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#660099] hover:text-purple-800 transition-colors"
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.2 }}
           >
-            <motion.h3
-              className="text-2xl font-bold mb-1"
-              variants={textVariants}
-            >
-              {tutor.name}
-            </motion.h3>
-            {tutor.linkedinUrl && (
-              <motion.a
-                href={tutor.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#660099] hover:text-purple-800 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <img
-                  src="/LinkedIn.png"
-                  className="w-[20px] h-[20px] object-contain"
-                />
-              </motion.a>
-            )}
-            <motion.p
-              className="text-gray-700 font-medium mb-2"
-              variants={textVariants}
-            >
-              {tutor.role}
-            </motion.p>
-            <motion.p
-              className="text-gray-700 mb-4"
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-              }}
-            >
-              {tutor.description}
-            </motion.p>
+          <img
+            src="/LinkedIn.png"
+            className="w-[20px] h-[20px] object-contain"
+          />
+          </motion.a>
+        )}
+        <motion.p
+          className="text-gray-700 font-medium mb-2"
+          variants={textVariants}
+        >
+          {tutor.role}
+        </motion.p>
+        <motion.p
+          className="text-gray-700 mb-4"
+          variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+          }}
+        >
+          {tutor.description}
+        </motion.p>
+        </motion.div>
+        <AnimatePresence mode="wait">
+        {isPlaying ? (
+          <motion.div
+          key="video"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          >
+          <VideoPlayer videoUrl={tutor.videoUrl} />
           </motion.div>
-          <AnimatePresence mode="wait">
-            {isPlaying ? (
-              <motion.div
-                key="video"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <VideoPlayer videoUrl={tutor.videoUrl} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="thumbnail"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <VideoThumbnail
-                  thumbnail={tutor.videoThumbnail}
-                  onClick={() => setIsPlaying(true)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        ) : (
+          <motion.div
+          key="thumbnail"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          >
+          <VideoThumbnail
+            thumbnail={tutor.videoThumbnail}
+            onClick={() => setIsPlaying(true)}
+          />
+          </motion.div>
+        )}
+        </AnimatePresence>
+      </div>
       </div>
     </motion.div>
   );
@@ -184,7 +184,7 @@ export function TutorSection() {
   return (
     <div className="min-h-screen bg-[#fff8d9] flex flex-col items-center justify-center">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#660099] mb-4 text-center">
+        <h1 className="mt-[80px] text-4xl md:text-5xl font-bold text-[#660099] mb-4 text-center">
           Our Tutors
         </h1>
         <p className="text-xl text-[#660099] mb-12 text-center">

@@ -5,13 +5,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { CourseCard } from "./course-card"
 import Link from "next/link"
 
-// Define the Course interface based on the course object structure
+// Define the Course interface based 
 interface Course {
   id: string
   title: string
   tag: string
   description: string
   levels: string
+  duration:string
   schedule: string
   image: string
 }
@@ -70,7 +71,6 @@ export function Carousel({ courses }: CarouselProps) {
     return () => clearInterval(interval)
   }, [currentSlide])
 
-  // Function to move to the next slide
   const nextSlide = () => {
     setCurrentSlide((prev) => {
       const maxSlides = Math.max(0, courses.length - visibleCards)
@@ -78,7 +78,6 @@ export function Carousel({ courses }: CarouselProps) {
     })
   }
 
-  // Function to move to the previous slide
   const prevSlide = () => {
     setCurrentSlide((prev) => {
       const maxSlides = Math.max(0, courses.length - visibleCards)
@@ -98,7 +97,7 @@ export function Carousel({ courses }: CarouselProps) {
       </button>
   
       {/* Carousel container */}
-      <div className="overflow-hidden">
+      <div >
         <div
           ref={flexContainerRef}
           className="flex transition-transform duration-500 ease-in-out gap-4"
@@ -119,6 +118,7 @@ export function Carousel({ courses }: CarouselProps) {
                 <CourseCard
                   id={course.id}
                   title={course.title}
+                  duration= {course.duration}
                   tag={course.tag}
                   description={course.description}
                   levels={course.levels}

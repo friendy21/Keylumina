@@ -6,6 +6,7 @@ interface CourseCardProps {
   id: string
   title: string
   tag: string
+  duration:string
   description: string
   levels: string
   schedule: string
@@ -17,6 +18,7 @@ export function CourseCard({
   id,
   title,
   tag,
+  duration,
   description,
   levels,
   schedule,
@@ -33,8 +35,10 @@ export function CourseCard({
       >
         <div className="p-5">
           <h3 className="text-xl font-bold text-gray-800 mb-1">{title}</h3>
+          <p className="text-gray-700 text-left">{duration}</p>
           <div className="flex justify-between items-start mb-2">
             <p className="text-sm text-gray-700">{levels}</p>
+            
             <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full border border-gray-300">
               {tag}
             </span>

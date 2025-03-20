@@ -63,7 +63,7 @@ const courses = [
     id: "2D-Motion-Design-Specialist-Course",
     title: "2D Motion Design Specialist Course",
     tag: "2D",
-    duration: "3 Month class",
+    duration: "3 Months class",
     description: "Recommended after Foundation",
     levels: [],
     // schedule: "",
@@ -73,7 +73,7 @@ const courses = [
     id: "Unreal-Engine-5-Render-Specialist-Course",
     title: "Unreal Engine 5 Render Specialist Course",
     tag: "UE 5",
-    duration: "3 Month class",
+    duration: "3 Months class",
     description: "Recommended after Foundation",
     levels: [],
     // schedule: "",
@@ -83,7 +83,7 @@ const courses = [
     id: "Comp-FX-Specialist-Course",
     title: "Comp-FX Specialist Course",
     tag: "Comp-FX",
-    duration: "3 Month class",
+    duration: "3 Months class",
     description: "Recommended after Foundation",
     levels: [],
     // schedule: "",
@@ -127,10 +127,8 @@ export default function HomePage() {
     }
   }, [controls, inView])
 
-  // Courses and Commitment data arrays remain unchanged from original
-
   return (
-    <div className="min-h-screen bg-[#FFFDF7]">
+    <div className="min-h-screen bg-[#FFFDF7] overflow-hidden">
       <Navigation />
 
       {/* Animated Hero Section */}
