@@ -142,9 +142,9 @@ export function PhoneForm({ onClose }: PhoneFormProps) {
               WhatsApp (+62) <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Image src="/whatsapp.png" alt="Phone Icon" width={20} height={20} />
-                </div>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-[#4c2a70]" />
+              </div>
               <input
                 type="tel"
                 id="whatsapp"
