@@ -681,7 +681,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navigation/>
-      <div className="container mx-auto px-4 py-12 flex-grow flex flex-col items-center mt-[30px]">
+      <div className="container mx-auto px-4 py-12 flex-grow flex flex-col items-center mt-[100px]">
         <div className="w-full max-w-3xl" ref={containerRef}>
           <button
             onClick={() => window.history.back()}
