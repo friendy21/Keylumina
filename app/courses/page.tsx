@@ -4,15 +4,55 @@ import { Navigation } from "@/app/components/navigation";
 import { Footer } from "@/app/components/footer";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Lenis from '@studio-freight/lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-[#f5f5f0] z-50">
+    <div className="relative">
+      <div className="w-16 h-16 border-4 border-[#d48fb6] border-t-[#660099] rounded-full animate-spin"></div>
+      <div className="mt-4 text-[#660099] font-semibold text-center">Loading...</div>
+    </div>
+  </div>
+);
+
+// Content wrapper component
+const ContentWrapper = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate content loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  return (
+    <AnimatePresence>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // Custom hook for smooth scrolling with Lenis
 function useSmoothScroll() {
@@ -91,6 +131,31 @@ function CourseCard({
   index,
 }: CourseCardProps) {
   const cardRef = useRef(null);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  
+  // Image shimmer effect
+  const shimmer = (w: number, h: number) => `
+    <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <linearGradient id="g">
+          <stop stop-color="#FBCF41" offset="20%" />
+          <stop stop-color="#FFF1BD" offset="50%" />
+          <stop stop-color="#FBCF41" offset="70%" />
+        </linearGradient>
+      </defs>
+      <rect width="${w}" height="${h}" fill="#FBCF41" />
+      <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+      <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+    </svg>`;
+  
+  const toBase64 = (str: string) =>
+    typeof window === 'undefined'
+      ? Buffer.from(str).toString('base64')
+      : window.btoa(str);
+  
+  // Placeholder data URL for shimmer effect
+  const placeholderSrc = `data:image/svg+xml;base64,${toBase64(shimmer(700, 475))}`;
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -154,13 +219,26 @@ function CourseCard({
             <p className="text-sm font-medium text-gray-700 line-clamp-3">{description}</p>
           </div>
 
-          <div className="bg-[#FBCF41] rounded-lg h-[200px] mb-4">
+          <div className="bg-[#FBCF41] rounded-lg h-[200px] mb-4 relative overflow-hidden">
             <div className="w-full h-full relative">
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#FBCF41] z-10">
+                  <div className="w-10 h-10 border-4 border-white border-t-[#660099] rounded-full animate-spin"></div>
+                </div>
+              )}
+              
               <Image
-                src={image || "/placeholder.svg"}
+                src={imageError ? "/placeholder.svg" : (image || "/placeholder.svg")}
                 alt={title}
                 fill
-                className="object-cover rounded"
+                className={`object-cover rounded transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                placeholder="blur"
+                blurDataURL={placeholderSrc}
+                onLoadingComplete={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
               />
             </div>
           </div>
@@ -253,8 +331,12 @@ export default function CoursesPage() {
   
   const titleRef = useRef(null);
   const coursesGridRef = useRef(null);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
+    // Set page as loaded after window load event
+    setPageLoaded(true);
+    
     // Title animation with GSAP
     if (titleRef.current) {
       gsap.fromTo(
@@ -283,39 +365,41 @@ export default function CoursesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5f5f0]">
-      <Navigation />
-      <main className="pt-24 pb-16 flex-grow">
-        <div className="container mx-auto">
-          <h1
-            ref={titleRef}
-            className="text-4xl md:text-5xl font-bold text-[#660099] mb-12 text-center"
-          >
-            COURSES
-          </h1>
-          <div 
-            ref={coursesGridRef}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            {courses.map((course, index) => (
-              <CourseCard
-                key={course.id}
-                id={course.id}
-                title={course.title}
-                tag={course.tag}
-                duration={course.duration}
-                description={course.description}
-                levels={course.levels}
-                schedule={course.schedule}
-                image={course.image}
-                showButton={true}
-                index={index}
-              />
-            ))}
+    <ContentWrapper>
+      <div className="min-h-screen flex flex-col bg-[#f5f5f0]">
+        <Navigation />
+        <main className="pt-24 pb-16 flex-grow">
+          <div className="container mx-auto">
+            <h1
+              ref={titleRef}
+              className="text-4xl md:text-5xl font-bold text-[#660099] mb-12 text-center"
+            >
+              COURSES
+            </h1>
+            <div 
+              ref={coursesGridRef}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {courses.map((course, index) => (
+                <CourseCard
+                  key={course.id}
+                  id={course.id}
+                  title={course.title}
+                  tag={course.tag}
+                  duration={course.duration}
+                  description={course.description}
+                  levels={course.levels}
+                  schedule={course.schedule}
+                  image={course.image}
+                  showButton={true}
+                  index={index}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ContentWrapper>
   );
 }
