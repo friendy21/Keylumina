@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Navigation } from "@/app/components/navigation";
 import { Footer } from "@/app/components/footer";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,6 +14,46 @@ import Lenis from "@studio-freight/lenis";
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-[#f5f5f0] z-50">
+    <div className="relative">
+      <div className="w-16 h-16 border-4 border-[#d48fb6] border-t-[#660099] rounded-full animate-spin"></div>
+      <div className="mt-4 text-[#660099] font-semibold text-center">Loading...</div>
+    </div>
+  </div>
+);
+
+// Content wrapper component
+const ContentWrapper = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate content loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  return (
+    <AnimatePresence>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 interface FAQItemProps {
   question: string;
@@ -73,13 +113,38 @@ const FAQItem = ({ question, answer, isOpen, toggleOpen, index }: FAQItemProps) 
   );
 };
 
+// Lazy-loaded image component with loading state
+const LazyImage = ({ href, alt = "Image" }) => {
+  const [loaded, setLoaded] = useState(false);
+  
+  return (
+    <div className="relative inline-block">
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-4 h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img 
+        src={href} 
+        alt={alt} 
+        onLoad={() => setLoaded(true)} 
+        className={`transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-30'}`}
+      />
+    </div>
+  );
+};
+
 export default function FAQPage() {
   const [openItems, setOpenItems] = useState<{ [key: number]: boolean }>({});
   const lenisRef = useRef<Lenis | null>(null);
   const headingRef = useRef(null);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
+    // Set page as loaded after window load event
+    setPageLoaded(true);
+    
     // Create Lenis instance for smooth scrolling
     lenisRef.current = new Lenis({
       duration: 1.2,
@@ -167,6 +232,30 @@ export default function FAQPage() {
     }
   };
 
+  // Enhanced links with loading state for external links
+  const EnhancedLink = ({ href, children, className = "" }) => {
+    const isExternal = href.startsWith('http');
+    
+    if (isExternal) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`text-purple-600 hover:underline ${className}`}
+        >
+          {children}
+        </a>
+      );
+    }
+    
+    return (
+      <Link href={href} className={`text-purple-600 hover:underline ${className}`}>
+        {children}
+      </Link>
+    );
+  };
+
   const faqItems = [
     {
       question: "What is the benefit of Online and Offline Class?",
@@ -211,24 +300,18 @@ export default function FAQPage() {
       answer: (
         <div>
           <p>For Comp FX and Unreal Engine 5:</p>
-          <a
+          <EnhancedLink
             href="https://www.linkedin.com/in/fredy-tan-5591a885/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-purple-600 hover:underline"
           >
             https://www.linkedin.com/in/fredy-tan-5591a885/
-          </a>
+          </EnhancedLink>
           
           <p className="mt-2">For 2D motion Design:</p>
-          <a
+          <EnhancedLink
             href="https://www.linkedin.com/in/novi-jingga-3ba074a5/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-purple-600 hover:underline"
           >
             https://www.linkedin.com/in/novi-jingga-3ba074a5/
-          </a>
+          </EnhancedLink>
         </div>
       ),
     },
@@ -258,53 +341,53 @@ export default function FAQPage() {
         <div>
           <p>
             For our complete modules for each course, please check the{" "}
-            <Link href="/courses" className="text-purple-600 hover:underline">
+            <EnhancedLink href="/courses">
               Courses page
-            </Link>
+            </EnhancedLink>
             .
           </p>
           
           <p className="font-semibold mt-4">TL;DR:</p>
           <ul className="space-y-2 mt-2">
             <li>
-              <Link href="/courses/Intro-AE-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Intro-AE-Course" className="font-medium">
                 Introduction to After Effects Course
-              </Link>
+              </EnhancedLink>
               : Showing After Effects potential to animate and create effects.
             </li>
             
             <li>
-              <Link href="/courses/Intro-UE5-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Intro-UE5-Course" className="font-medium">
                 Introduction to Unreal Engine 5 Course
-              </Link>
+              </EnhancedLink>
               : Showing Unreal Engine 5 as a better alternative to traditional 3D animation render
             </li>
             
             <li>
-              <Link href="/courses/Design-Foundation-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Design-Foundation-Course" className="font-medium">
                 Design Foundation Course
-              </Link>
+              </EnhancedLink>
               : Learning design theories and applying it to assignments
             </li>
             
             <li>
-              <Link href="/courses/Unreal-Engine-5-Render-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Unreal-Engine-5-Render-Specialist-Course" className="font-medium">
                 Unreal Engine 5 Render Specialist Course
-              </Link>
+              </EnhancedLink>
               : Learning how to use Unreal Engine 5 from basic setup to render, 3D data between programs, variation of tools, and responsibility of render artist in 3D animation industry.
             </li>
             
             <li>
-              <Link href="/courses/Comp-FX-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Comp-FX-Specialist-Course" className="font-medium">
                 Comp-FX Specialist Course
-              </Link>
+              </EnhancedLink>
               : Learning how to create effects with Adobe After Effects, from native tools to multiple plugins, and understanding the role of a Comp FX artist.
             </li>
             
             <li>
-              <Link href="/courses/2D-Motion-Design-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/2D-Motion-Design-Specialist-Course" className="font-medium">
                 2D Motion Design Specialist Course
-              </Link>
+              </EnhancedLink>
               : Learning how to create 2D animation from asset creation with Adobe Illustrator, rigging, and animation with Adobe After Effects.
             </li>
           </ul>
@@ -330,49 +413,49 @@ export default function FAQPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/Intro-AE-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/Intro-AE-Course">
                       Introduction to After Effects Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">2</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/Intro-UE5-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/Intro-UE5-Course">
                       Introduction to Unreal Engine 5 Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">1</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/Design-Foundation-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/Design-Foundation-Course">
                       Design Foundation Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">9</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/Unreal-Engine-5-Render-Specialist-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/Unreal-Engine-5-Render-Specialist-Course">
                       Unreal Engine 5 Render Specialist Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">26</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/Comp-FX-Specialist-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/Comp-FX-Specialist-Course">
                       Comp-FX Specialist Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">22</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href="/courses/2D-Motion-Design-Specialist-Course" className="text-purple-600 hover:underline">
+                    <EnhancedLink href="/courses/2D-Motion-Design-Specialist-Course">
                       2D Motion Design Specialist Course
-                    </Link>
+                    </EnhancedLink>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">23</td>
                 </tr>
@@ -388,44 +471,44 @@ export default function FAQPage() {
         <div>
           <ul className="space-y-4">
             <li>
-              <Link href="/courses/Intro-AE-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Intro-AE-Course" className="font-medium">
                 Introduction to After Effects Course
-              </Link>
+              </EnhancedLink>
               : Adobe After Effects 2025
             </li>
             
             <li>
-              <Link href="/courses/Intro-UE5-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Intro-UE5-Course" className="font-medium">
                 Introduction to Unreal Engine 5 Course
-              </Link>
+              </EnhancedLink>
               : Unreal Engine 5.3
             </li>
             
             <li>
-              <Link href="/courses/Design-Foundation-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Design-Foundation-Course" className="font-medium">
                 Design Foundation Course
-              </Link>
+              </EnhancedLink>
               : Adobe After Effects 2025, Adobe Media Encoder 2025 (Optional)
             </li>
             
             <li>
-              <Link href="/courses/Unreal-Engine-5-Render-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Unreal-Engine-5-Render-Specialist-Course" className="font-medium">
                 Unreal Engine 5 Render Specialist Course
-              </Link>
+              </EnhancedLink>
               : Unreal Engine 5.3, Unreal Engine 5.5, Ultra Dynamic Sky, Blender, Autodesk Maya (Optional), Adobe After Effects 2025 (Optional, can be switched with other compositing program), VC Optical Flare (Optional), RSMB (Optional), Adobe Media Encoder 2025 (Optional)
             </li>
             
             <li>
-              <Link href="/courses/Comp-FX-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/Comp-FX-Specialist-Course" className="font-medium">
                 Comp-FX Specialist Course
-              </Link>
+              </EnhancedLink>
               : Adobe After Effects 2025, Redgiant Trapcode 2025, VC Element 3D v2.2, VC Optical Flare, RSMB (Optional)
             </li>
             
             <li>
-              <Link href="/courses/2D-Motion-Design-Specialist-Course" className="font-medium text-purple-600 hover:underline">
+              <EnhancedLink href="/courses/2D-Motion-Design-Specialist-Course" className="font-medium">
                 2D Motion Design Specialist Course
-              </Link>
+              </EnhancedLink>
               : Adobe Illustrator 2025, Adobe After Effects 2025, Adobe Media Encoder 2025 (Optional), Adobe Script Extender
             </li>
           </ul>
@@ -444,8 +527,8 @@ export default function FAQPage() {
       question: "What if I have additional Questions?",
       answer: (
         <div>
-          <p>You can contact us at <a href="http://www.keylumina.com" className="text-purple-600 hover:underline">www.keylumina.com</a></p>
-          <p className="mt-2">Or can fill in <a href="http://bit.ly/keyluminasurvey" className="text-purple-600 hover:underline">bit.ly/keyluminasurvey</a></p>
+          <p>You can contact us at <EnhancedLink href="http://www.keylumina.com">www.keylumina.com</EnhancedLink></p>
+          <p className="mt-2">Or can fill in <EnhancedLink href="http://bit.ly/keyluminasurvey">bit.ly/keyluminasurvey</EnhancedLink></p>
           <p>There is a section there for questions</p>
         </div>
       ),
@@ -453,33 +536,35 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5f5f0]">
-      <Navigation />
-      <main className="pt-24 pb-16 flex-grow">
-        <div className="container mx-auto px-4">
-          <h1
-            ref={headingRef}
-            className="text-4xl md:text-5xl font-bold text-[#660099] mb-8 text-center"
-          >
-            Frequently Asked Questions
-          </h1>
+    <ContentWrapper>
+      <div className="min-h-screen flex flex-col bg-[#f5f5f0]">
+        <Navigation />
+        <main className="pt-24 pb-16 flex-grow">
+            <div className="container mx-auto px-4 mt-[50px]">
+            <h1
+              ref={headingRef}
+              className="text-4xl md:text-5xl font-bold text-[#660099] mb-8 text-center"
+            >
+              Frequently Asked Questions
+            </h1>
 
-          <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-            {faqItems.map((item, index) => (
-              <div id={`faq-item-${index}`} key={index}>
-                <FAQItem
-                  question={item.question}
-                  answer={item.answer}
-                  isOpen={!!openItems[index]}
-                  toggleOpen={() => toggleItem(index)}
-                  index={index}
-                />
-              </div>
-            ))}
+            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+              {faqItems.map((item, index) => (
+                <div id={`faq-item-${index}`} key={index}>
+                  <FAQItem
+                    question={item.question}
+                    answer={item.answer}
+                    isOpen={!!openItems[index]}
+                    toggleOpen={() => toggleItem(index)}
+                    index={index}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </ContentWrapper>
   );
 }
