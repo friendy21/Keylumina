@@ -120,7 +120,7 @@ export async function submitEmailForm(formData: FormData) {
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
       to: "friendykaliman@gmail.com",
-      subject: `[Website Contact] ${subject}`,
+      subject: `[Keylumina Website] ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
@@ -174,7 +174,7 @@ export async function submitPhoneForm(formData: FormData) {
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
       to: "friendykaliman@gmail.com",
-      subject: `[Website Contact] WhatsApp Request`,
+      subject: `[Keylumina Website] WhatsApp Request`,
       html: `
         <h2>New WhatsApp Contact Request</h2>
         <p><strong>Name:</strong> ${name}</p>
@@ -226,7 +226,7 @@ export async function submitSocialForm(formData: FormData) {
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
       to: "friendykaliman@gmail.com",
-      subject: `[Website Contact] ${socialPlatform.charAt(0).toUpperCase() + socialPlatform.slice(1)} Request`,
+      subject: `[Keylumina Website] ${socialPlatform.charAt(0).toUpperCase() + socialPlatform.slice(1)} Request`,
       html: `
         <h2>New Social Media Contact Request</h2>
         <p><strong>Name:</strong> ${name}</p>

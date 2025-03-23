@@ -12,7 +12,7 @@ interface Course {
   tag: string
   description: string
   levels: string
-  duration:string
+  duration: string
   schedule: string
   image: string
 }
@@ -26,8 +26,10 @@ export function Carousel({ courses }: CarouselProps) {
   const [visibleCards, setVisibleCards] = useState(3)
   const [cardWidth, setCardWidth] = useState(0)
   const [gap, setGap] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
   const flexContainerRef = useRef<HTMLDivElement>(null)
   const firstCardRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
 
   // Handle window resize to adjust the number of visible cards
   useEffect(() => {
@@ -63,13 +65,25 @@ export function Carousel({ courses }: CarouselProps) {
     return () => window.removeEventListener("resize", updateSizes)
   }, [])
 
-  // Auto-scroll the carousel every 2 seconds
+  // Auto-scroll the carousel every 6 seconds, unless paused
   useEffect(() => {
+    if (isPaused) return
+    
     const interval = setInterval(() => {
       nextSlide()
-    }, 2000)
+    }, 5000)
+    
     return () => clearInterval(interval)
-  }, [currentSlide])
+  }, [currentSlide, isPaused])
+
+  // Handle mouse hover events
+  const handleMouseEnter = () => {
+    setIsPaused(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsPaused(false)
+  }
 
   const nextSlide = () => {
     setCurrentSlide((prev) => {
@@ -86,7 +100,12 @@ export function Carousel({ courses }: CarouselProps) {
   }
 
   return (
-    <div className="relative">
+    <div 
+      className="relative" 
+      ref={carouselRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Previous slide button */}
       <button
         onClick={prevSlide}
@@ -97,7 +116,7 @@ export function Carousel({ courses }: CarouselProps) {
       </button>
   
       {/* Carousel container */}
-      <div >
+      <div>
         <div
           ref={flexContainerRef}
           className="flex transition-transform duration-500 ease-in-out gap-4"
@@ -118,7 +137,7 @@ export function Carousel({ courses }: CarouselProps) {
                 <CourseCard
                   id={course.id}
                   title={course.title}
-                  duration= {course.duration}
+                  duration={course.duration}
                   tag={course.tag}
                   description={course.description}
                   levels={course.levels}

@@ -1,104 +1,120 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
-import { PhoneForm } from "./contact-forms/phone-form"
-import { EmailForm } from "./contact-forms/email-form"
-import { SocialForm } from "./contact-forms/social-form"
 
 export function Footer() {
-  const [activeForm, setActiveForm] = useState<string | null>(null)
-
-  const openContactForm = (formType: string) => {
-    setActiveForm(formType)
-  }
-
-  const closeContactForm = () => {
-    setActiveForm(null)
-  }
-
   return (
-    <>
-      <footer className="bg-[#660099] text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-            <div className="flex items-center mb-4 md:mb-0">
+    <footer className="bg-[#660099] text-white py-8 w-full mt-auto">
+      <div className="container mx-auto px-4 flex flex-col items-center">
+        {/* Logo and Contact Us section */}
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-6 w-full">
+          <div className="flex items-center mb-4 md:mb-0">
+            <div className="rounded-full overflow-hidden w-16 h-16 mr-2 flex items-center justify-center bg-white">
               <Image
-                src="/KMS_Icon.png?height=50&width=50"
+                src="/KMS_Icon.png?height=60&width=60"
                 alt="Keylumina Logo"
-                width={50}
-                height={50}
-                className="mr-4"
+                width={120}
+                height={60}
+                className="object-cover"
               />
-              <h3 className="text-xl font-bold">CONTACT US</h3>
             </div>
-
-            <div className="flex flex-wrap items-center gap-4 md:gap-6">
-              <button
-                className="flex items-center hover:text-[#FBCF41] transition-colors"
-              >
-                <a
-                  href="tel:+0888888888888"
-                  className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
-                >
-                <img src="/Whatsapp.png" className="w-6 h-6" alt="Whatsapps" />
-                <span>+088 8888 888888</span>
-                </a>
-              </button>
-
-              <button
-                className="flex items-center hover:text-[#FBCF41] transition-colors"
-              >
-                <a
-                href="https://www.tiktok.com/@keylumina"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
-              >
-                <img src="tiktok.png" className="w-6 h-6" alt="Tiktok" />
-                <span>Tiktok</span>
-                </a>
-              </button>
-
-              <button
-                className="flex items-center hover:text-[#FBCF41] transition-colors"
-              ><a
-                href="https://www.youtube.com/@Keylumina"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
-              >
-                <img src="Youtube.png" className="w-6 h-6" alt="Facebook" />
-                <span>Youtube</span>
-                </a>
-              </button>
-
-              <button
-                className="flex items-center hover:text-[#FBCF41] transition-colors"
-              ><a
-                  href="https://www.instagram.com/keylumina/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
-                >
-                <img src="Instagram.png" className="w-6 h-6" alt="Live class icon" />
-                <span>Instagram</span>
-                </a>
-              </button>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="mb-4">Keylumina | Alright Reserved 2025</p>
+            <h3 className="text-xl font-bold">CONTACT US</h3>
           </div>
         </div>
-      </footer>
-
-      {/* Contact Forms */}
-      {activeForm === "phone" && <PhoneForm onClose={closeContactForm} />}
-      {activeForm === "email" && <EmailForm onClose={closeContactForm} />}
-      {activeForm === "social" && <SocialForm onClose={closeContactForm} />}
-    </>
+        
+        {/* Social Media Links - Mobile Layout Adjusted */}
+        <div className="flex flex-col items-center md:hidden w-full">
+          {/* WhatsApp and TikTok in first row on mobile */}
+          <div className="flex justify-center w-full mb-4">
+            <a
+              href="tel:+0888888888888"
+              className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer mr-8"
+            >
+              <img src="/Whatsapp.png" className="w-6 h-6 mr-2" alt="Whatsapps" />
+              <span>+088 8888 888888</span>
+            </a>
+            
+            <a
+              href="https://www.tiktok.com/@keylumina"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+            >
+              <img src="/tiktok.png" className="w-6 h-6 mr-2" alt="Tiktok" />
+              <span>TikTok</span>
+            </a>
+          </div>
+          
+          {/* YouTube and Instagram in second row on mobile */}
+          <div className="flex justify-center w-full mb-6">
+            <a
+              href="https://www.youtube.com/@Keylumina"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer mr-8"
+            >
+              <img src="/Youtube.png" className="w-6 h-6 mr-2" alt="Youtube" />
+              <span>YouTube</span>
+            </a>
+            
+            <a
+              href="https://www.instagram.com/keylumina/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+            >
+              <img src="/Instagram.png" className="w-6 h-6 mr-2" alt="Instagram" />
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+        
+        {/* Desktop layout - all social media links in one row */}
+        <div className="hidden md:flex md:flex-wrap md:items-center md:justify-end md:gap-8 w-full">
+          <a
+            href="tel:+0888888888888"
+            className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+          >
+            <img src="/Whatsapp.png" className="w-6 h-6 mr-2" alt="Whatsapps" />
+            <span>+088 8888 888888</span>
+          </a>
+          
+          <a
+            href="https://www.tiktok.com/@keylumina"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+          >
+            <img src="/tiktok.png" className="w-6 h-6 mr-2" alt="Tiktok" />
+            <span>TikTok</span>
+          </a>
+          
+          <a
+            href="https://www.youtube.com/@Keylumina"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+          >
+            <img src="/Youtube.png" className="w-6 h-6 mr-2" alt="Youtube" />
+            <span>YouTube</span>
+          </a>
+          
+          <a
+            href="https://www.instagram.com/keylumina/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center hover:text-[#FBCF41] transition-colors cursor-pointer"
+          >
+            <img src="/Instagram.png" className="w-6 h-6 mr-2" alt="Instagram" />
+            <span>Instagram</span>
+          </a>
+        </div>
+        
+        {/* Copyright text */}
+        <div className="text-center mt-4 w-full">
+          <p>KeyLumina | Alright Reserved 2025</p>
+        </div>
+      </div>
+    </footer>
   )
 }
-

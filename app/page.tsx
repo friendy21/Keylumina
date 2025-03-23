@@ -1,18 +1,19 @@
 "use client"
 
 import { Suspense, useEffect } from "react"
-import { Canvas } from "@react-three/fiber"
-import { Environment } from "@react-three/drei"
 import { motion, useAnimation, AnimatePresence } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { Button } from "@/components/ui/button"
 import { Carousel } from "./components/carousel"
-import { KeyluminaScene } from "./components/keylumina-scene"
 import { Navigation } from "./components/navigation"
 import { TutorSection } from "./components/tutor-section"
 import { Commitment } from "./components/Commitment"
 import { Footer } from "./components/footer"
 import Link from "next/link"
+import Head from "next/head"
+// Import the ResponsiveBackground component
+// Make sure the path is correct to your .tsx file
+import { ResponsiveBackground } from "./components/ResponsiveBackground"
 
 const fadeIn = {
   hidden: { opacity: 0 },
@@ -96,27 +97,28 @@ const OurCommitment = [
     id: "expert-tutors",
     title: "100% Live class",
     description: "All class are live and recorded so students can review after class if needed. Students can ask teachers any day, and small class are held to answer complex questions.",
-    icon: <img src="Commitment_Icons/CI_01.png" className="w-6 h-6" alt="Live class icon" />,
+    icon: <img src="Commitment_Icons/CI_01.png" className="w-16 h-16" alt="Live class icon" />,
   },
   {
     id: "flexible-learning",
     title: "Taught by industry experts",
     description: "All class are directly taught by industry experienced artist, and feedback for assignments is given directly on LIVE class.",
-    icon: <img src="Commitment_Icons/CI_02.png" className="w-6 h-6" alt="Live class icon" />,
+    icon: <img src="Commitment_Icons/CI_02.png" className="w-16 h-16" alt="Live class icon" />,
   },
   {
     id: "practical-projects",
     title: "Intensive and challenging classes",
     description: "Industry level complex material are taught to student. Feedbacks for assignment are a mix of guidance from teacher, and critics from senior.",
-    icon: <img src="Commitment_Icons/CI_03.png" className="w-6 h-6" alt="Live class icon" />,
+    icon: <img src="Commitment_Icons/CI_03.png" className="w-16 h-16" alt="Live class icon" />,
   },
   {
     id: "career-support",
     title: "Soft-skill, timeline, and workflow",
     description: "We teach how to plan a workflow and an efficient timeline while also building positive habit of students, how to diagnose weakness, and improve in the future. ",
-    icon: <img src="Commitment_Icons/CI_04.png" className="w-6 h-6" alt="Live class icon" />,
+    icon: <img src="Commitment_Icons/CI_04.png" className="w-16 h-16" alt="Live class icon" />,
   },
 ]
+
 export default function HomePage() {
   const controls = useAnimation()
   const [ref, inView] = useInView({ threshold: 0.1 })
@@ -129,37 +131,54 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FFFDF7] overflow-hidden">
+      <Head>
+        <style jsx global>{`
+          /* Custom Scrollbar Styling */
+          ::-webkit-scrollbar {
+            width: 8px;
+          }
+          
+          ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+          }
+          
+          ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #660099, #9900cc);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            box-shadow: 0 0 10px rgba(102, 0, 153, 0.5);
+          }
+          
+          ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #9900cc, #cc00ff);
+            background-clip: content-box;
+            box-shadow: 0 0 15px rgba(102, 0, 153, 0.8);
+          }
+          
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          
+          /* Hide scrollbar for IE, Edge and Firefox */
+          .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+          
+          /* For Firefox */
+          html {
+            scrollbar-width: thin;
+            scrollbar-color: #660099 transparent;
+          }
+        `}</style>
+      </Head>
       <Navigation />
 
-      {/* Animated Hero Section */}
-      <section className="relative h-screen w-full overflow-hidden bg-[#c8b6d8] pt-16">
-        <Canvas className="absolute inset-0">
-          <Suspense fallback={null}>
-            <KeyluminaScene />
-            <Environment preset="studio" />
-          </Suspense>
-        </Canvas>
-
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4"
-        >
-          <motion.h1
-            variants={slideUp}
-            className="text-6xl md:text-8xl font-black uppercase tracking-tighter text-[#660099] mb-6"
-          >
-            <motion.div
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              transition={{ type: "spring", stiffness: 120 }}
-            >
-              keylumina
-            </motion.div>
-          </motion.h1>
-        </motion.div>
-      </section>
+      {/* Use the Responsive Background Component */}
+      <ResponsiveBackground />
 
       {/* Animated Courses Section */}
       <motion.section
@@ -173,7 +192,7 @@ export default function HomePage() {
             variants={slideUp}
             className="text-[#3a0e58] text-5xl md:text-6xl font-bold mb-8 text-center"
           >
-            Courses
+            COURSES
           </motion.h2>
           
           <motion.div variants={scaleUp}>
@@ -189,8 +208,6 @@ export default function HomePage() {
             <Link href="/courses">
               <Button 
                 className="bg-[#660099] hover:bg-[#4d0073] text-white"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
                 View All Courses
               </Button>
@@ -217,12 +234,13 @@ export default function HomePage() {
             whileInView={{ x: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 100 }}
             viewport={{ once: true }}
-            className="text-[#660099] text-5xl md:text-6xl font-bold mb-4 text-center"
+            className="text-[#660099] text-5xl md:text-6xl font-bold mb-8 text-center"
           >
             Our Commitment to Quality Learning
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {OurCommitment.map((feature, index) => (
               <motion.div
                 key={feature.id}
@@ -230,6 +248,7 @@ export default function HomePage() {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ delay: index * 0.2 }}
                 viewport={{ once: true }}
+                className="h-full" 
               >
                 <Commitment
                   title={feature.title}
@@ -241,26 +260,19 @@ export default function HomePage() {
           </div>
 
           <motion.div
-            className="text-center mt-8"
+            className="text-center mt-12"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <p className="text-[#660099]">
-            Communication is key to learning. We encourage student to ask a lot and explore as creatively as they can. As each student is unique and have their own pace, we will give them guidance according to their strengths and gave tips on how to use it to cover for their weaknesses.
+            <p className="text-[#660099] max-w-4xl mx-auto">
+              Communication is key to learning. We encourage student to ask a lot and explore as creatively as they can. As each student is unique and have their own pace, we will give them guidance according to their strengths and gave tips on how to use it to cover for their weaknesses.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Animated Footer */}
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
+      {/*Footer */}
         <Footer />
-      </motion.div>
     </div>
   )
 }
