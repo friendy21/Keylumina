@@ -30,6 +30,9 @@ export function Carousel({ courses }: CarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const carouselRef = useRef<HTMLDivElement>(null)
 
+  // Create an extended array with duplicated items for infinity scrolling
+  const extendedCourses = [...courses, ...courses, ...courses]
+
   // Calculate responsive values
   useEffect(() => {
     const handleResize = () => {
@@ -106,43 +109,39 @@ export function Carousel({ courses }: CarouselProps) {
     }
   }, [])
 
-  // Pagination calculation
-  const totalPages = Math.max(1, Math.ceil(courses.length - visibleCards + 1))
-  const isLastPage = currentSlide >= totalPages - 1
-
-  // Normalized slide position handling
-  const normalizeSlidePosition = (position: number) => {
-    if (position < 0) return totalPages - 1
-    if (position >= totalPages) return 0
-    return position
-  }
-
-  const nextSlide = () => {
-    if (courses.length <= visibleCards) return
-    
-    setCurrentSlide(prev => {
-      if (isLastPage) {
-        // Quick reset to beginning without animation
+  // Pagination calculation - adjust for the extended courses array
+  const totalSlides = extendedCourses.length
+  // Force 6 pagination dots
+  const originalTotalPages = 6
+  
+  // Reset to original courses position when reaching the extended boundaries
+  useEffect(() => {
+    if (currentSlide >= courses.length + visibleCards) {
+      // We've scrolled too far right into the duplicated section
+      // Reset back to the original section without animation
+      setTimeout(() => {
         setTransition(false)
+        setCurrentSlide(currentSlide - courses.length)
         setTimeout(() => setTransition(true), 50)
-        return 0
-      }
-      return normalizeSlidePosition(prev + 1)
-    })
+      }, 500) // Wait for transition to complete
+    } else if (currentSlide < 0) {
+      // We've scrolled too far left
+      // Reset to end of original section
+      setTimeout(() => {
+        setTransition(false)
+        setCurrentSlide(currentSlide + courses.length)
+        setTimeout(() => setTransition(true), 50)
+      }, 500) // Wait for transition to complete
+    }
+  }, [currentSlide, courses.length, visibleCards])
+
+  // Slide control functions for infinite scrolling
+  const nextSlide = () => {
+    setCurrentSlide(prev => prev + 1)
   }
 
   const prevSlide = () => {
-    if (courses.length <= visibleCards) return
-    
-    setCurrentSlide(prev => {
-      if (prev <= 0) {
-        // Quick reset to end without animation
-        setTransition(false)
-        setTimeout(() => setTransition(true), 50)
-        return totalPages - 1
-      }
-      return normalizeSlidePosition(prev - 1)
-    })
+    setCurrentSlide(prev => prev - 1)
   }
 
   // Calculate precise card width including potential gap
@@ -157,6 +156,18 @@ export function Carousel({ courses }: CarouselProps) {
     return currentSlide * cardWidth
   }
 
+  // For pagination indicators, normalize to show the actual position within original courses
+  const getNormalizedSlidePosition = () => {
+    // Get the position relative to original course set
+    let normalizedPosition = currentSlide % courses.length
+    // Handle negative values
+    if (normalizedPosition < 0) normalizedPosition += courses.length
+    
+    // Convert the slide position to match one of the 6 dots
+    // Map the full course length to 6 segments
+    return Math.floor((normalizedPosition / courses.length) * originalTotalPages) % originalTotalPages
+  }
+
   // Handle mouse hover events
   const handleMouseEnter = () => setIsPaused(true)
   const handleMouseLeave = () => setIsPaused(false)
@@ -166,7 +177,7 @@ export function Carousel({ courses }: CarouselProps) {
 
   return (
     <div 
-      className="relative overflow-hidden"
+      className="relative pb-24" /* Removed overflow-hidden and increased padding */
       ref={carouselRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -174,7 +185,7 @@ export function Carousel({ courses }: CarouselProps) {
       {/* Carousel container with improved scroll math */}
       <div 
         ref={containerRef}
-        className="w-full"
+        className="w-full overflow-hidden" /* Added overflow-hidden here instead */
       >
         <div
           className="flex"
@@ -183,9 +194,9 @@ export function Carousel({ courses }: CarouselProps) {
             transition: transition ? 'transform 500ms ease-in-out' : 'none',
           }}
         >
-          {courses.map((course) => (
+          {extendedCourses.map((course, index) => (
             <div
-              key={course.id}
+              key={`${course.id}-${index}`}
               className="flex-none px-2"
               style={{
                 width: `${100 / visibleCards}%`,
@@ -215,7 +226,6 @@ export function Carousel({ courses }: CarouselProps) {
             onClick={prevSlide}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/50 hover:bg-white/80 p-2 rounded-full shadow-md transition-colors"
             aria-label="Previous slide"
-            disabled={currentSlide === 0 && !isLastPage}
           >
             <ChevronLeft className="h-6 w-6 text-[#3a0e58]" />
           </button>
@@ -224,22 +234,31 @@ export function Carousel({ courses }: CarouselProps) {
             onClick={nextSlide}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/50 hover:bg-white/80 p-2 rounded-full shadow-md transition-colors"
             aria-label="Next slide"
-            disabled={isLastPage && currentSlide !== 0}
           >
             <ChevronRight className="h-6 w-6 text-[#3a0e58]" />
           </button>
         </>
       )}
       
-      {/* Pagination indicators */}
-      {showNavigation && totalPages > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {Array.from({ length: totalPages }).map((_, index) => (
+      {/* Pagination indicators - positioned with 30px bottom margin */}
+      {showNavigation && originalTotalPages > 1 && (
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 flex gap-3 z-10"
+          style={{
+            bottom: '30px', // Fixed 30px from bottom
+          }}
+        >
+          {Array.from({ length: originalTotalPages }).map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                currentSlide === index ? 'bg-[#3a0e58]' : 'bg-gray-300'
+              onClick={() => {
+                // Calculate the target slide position in the extended array
+                // Position at the start of each segment
+                const targetPosition = Math.floor((index / originalTotalPages) * courses.length) + courses.length
+                setCurrentSlide(targetPosition)
+              }}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                getNormalizedSlidePosition() === index ? 'bg-[#3a0e58]' : 'bg-gray-300'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
