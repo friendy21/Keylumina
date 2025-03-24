@@ -120,7 +120,6 @@ function TutorCard({ tutor, alignment = "left", index }) {
   const isLeft = alignment === "left";
   
   const cardRef = useRef(null);
-  const imageRef = useRef(null);
   
   useEffect(() => {
     // GSAP animation for the card reveal
@@ -143,17 +142,7 @@ function TutorCard({ tutor, alignment = "left", index }) {
       }
     );
     
-    // Parallax effect for the image
-    gsap.to(imageRef.current, {
-      y: -50,
-      ease: "none",
-      scrollTrigger: {
-        trigger: cardRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: true
-      }
-    });
+    // Removed all parallax effects for the image
   }, []);
   
   // Staggered animation variants for Framer Motion elements
@@ -182,19 +171,18 @@ function TutorCard({ tutor, alignment = "left", index }) {
       ref={cardRef}
       className="bg-[#fff8d9] rounded-lg overflow-hidden h-full flex flex-col md:flex-row hover:-translate-y-1 transition-transform duration-300 shadow-lg"
     >
-      {/* Image section - on mobile it's always at the top */}
+      {/* Image section - removed animation and fixed display */}
       <div 
         className={`md:w-1/2 ${isLeft ? "md:order-first" : "md:order-last"} relative overflow-hidden order-first`}
-        style={{ height: "auto" }}
       >
-        <div ref={imageRef} className="w-full h-full absolute inset-0">
-          <img
-            src={tutor.image || "/placeholder.svg"}
-            alt={tutor.name}
-            className="w-full h-full object-contain transition-all duration-700"
-          />
-        </div>
-        <div style={{ paddingTop: "133%" }} className="relative w-full"></div>
+        {/* Removed the animated div with ref and replaced with static image */}
+        <img
+          src={tutor.image || "/placeholder.svg"}
+          alt={tutor.name}
+          className="w-full h-full object-contain transition-all duration-700"
+          style={{ maxHeight: "100%", width: "100%" }}
+        />
+        {/* Removed the padding-top spacer div that was causing issues */}
       </div>
       
       {/* Content section - on mobile it's always below the image */}
@@ -221,7 +209,7 @@ function TutorCard({ tutor, alignment = "left", index }) {
                 href={tutor.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 mb-4 inline-block ml-auto"
+                className="text-blue-600 mb-4 inline-block ml-auto mt-5"
                 variants={itemVariants}
               >
                 <svg 
@@ -287,48 +275,10 @@ function TutorCard({ tutor, alignment = "left", index }) {
   );
 }
 
-// Background particles component
-const BackgroundParticles = () => {
-  const particlesRef = useRef([]);
-  
-  useEffect(() => {
-    // Animate particles with GSAP
-    particlesRef.current.forEach((particle, i) => {
-      gsap.to(particle, {
-        x: `random(-50, 50)%`,
-        y: `random(-50, 50)%`,
-        opacity: gsap.utils.random(0.2, 0.5),
-        duration: gsap.utils.random(15, 30),
-        repeat: -1,
-        yoyo: true,
-        ease: "none"
-      });
-    });
-  }, []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
-        <div
-          key={i}
-          ref={el => particlesRef.current[i] = el}
-          className="absolute w-4 h-4 rounded-full bg-purple-200 opacity-30"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            transform: `scale(${Math.random() * 0.5 + 0.5})`
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
 export function TutorSection() {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
-  const backgroundRef = useRef(null);
   
   // Initialize Lenis for smooth scrolling
   useEffect(() => {
@@ -353,21 +303,7 @@ export function TutorSection() {
     // Bind Lenis to requestAnimationFrame for high FPS
     requestAnimationFrame(raf);
     
-    // GSAP animation for the background parallax
-    gsap.fromTo(
-      backgroundRef.current,
-      { y: "0%" },
-      {
-        y: "30%",
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true
-        }
-      }
-    );
+    // Removed background parallax animation
     
     // Animate title and subtitle
     gsap.fromTo(
@@ -415,12 +351,10 @@ export function TutorSection() {
       ref={sectionRef}
       className="relative bg-[#d9c9e6] flex flex-col items-center justify-center py-20 w-full overflow-hidden"
     >
-      {/* Background effects */}
+      {/* Background without animation */}
       <div 
-        ref={backgroundRef}
         className="absolute inset-0 bg-[#d9c9e6] from-purple-100/30 to-transparent"
       />
-      <BackgroundParticles />
       
       <div className="container bg-[#d9c9e6] mx-auto px-6 w-full max-w-screen-2xl relative z-10">
         <div ref={titleRef}>
