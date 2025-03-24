@@ -9,7 +9,7 @@ export const metadata = {
   title: "KeyLumina Media School",
   description: "Learn motion design and CG from zero to pro",
   icons: {
-    icon: '/KMS_Icon.png',
+    icon: '/KMS_logo_web.png',
   }
 }
 
