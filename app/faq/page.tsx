@@ -98,17 +98,23 @@ const FAQItem = ({ question, answer, isOpen, toggleOpen, index }: FAQItemProps) 
           {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
       </button>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="px-4 pb-5"
-        >
-          <div className="text-gray-600 whitespace-pre-line">{answer}</div>
-        </motion.div>
-      )}
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ 
+              duration: 0.3,
+              // Use slightly faster timing for height to reduce jitter
+              height: { duration: 0.25, ease: "easeOut" }
+            }}
+            className="px-4 pb-5 overflow-hidden"
+          >
+            <div className="text-gray-600 whitespace-pre-line">{answer}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -139,50 +145,55 @@ export default function FAQPage() {
   const lenisRef = useRef<Lenis | null>(null);
   const headingRef = useRef(null);
   const [pageLoaded, setPageLoaded] = useState(false);
+  const scrollInProgress = useRef(false);
 
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
     // Set page as loaded after window load event
     setPageLoaded(true);
     
-    // Create Lenis instance for smooth scrolling
+    // Create Lenis instance for smooth scrolling with optimized settings
     lenisRef.current = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential ease-out
+      duration: 0.8, // Reduced from 1.2 for more responsive feel
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       direction: 'vertical',
       gestureDirection: 'vertical',
       smooth: true,
       smoothTouch: false,
       touchMultiplier: 2,
       infinite: false,
-      // Set to 90fps (1000ms / 90 = ~11.11ms per frame)
       wheelMultiplier: 1,
       syncTouch: true,
+      // Add new property to prevent jitter during scroll
+      lerp: 0.1, // Lower value = smoother but slower; adjust if needed
     });
     
-    // Synchronize Lenis with GSAP's ticker
-    gsap.ticker.add((time) => {
-      lenisRef.current?.raf(time * 1000);
-    });
+    // Setup RAF for Lenis
+    function raf(time) {
+      lenisRef.current?.raf(time);
+      requestAnimationFrame(raf);
+    }
+    
+    requestAnimationFrame(raf);
     
     // Update ScrollTrigger when Lenis scrolls
-    lenisRef.current.on('scroll', ScrollTrigger.update);
+    lenisRef.current.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+      ScrollTrigger.update();
+      scrollInProgress.current = Math.abs(velocity) > 0.1;
+    });
 
-    // Configure GSAP's ticker with a higher frame rate (90fps)
-    gsap.ticker.fps(90);
-    
-    // Optimize animations for high FPS
-    gsap.ticker.lagSmoothing(2000, 16);
+    // Configure GSAP settings for better performance
     gsap.config({
-      force3D: "auto",
+      force3D: true,
       autoSleep: 60,
       nullTargetWarn: false,
     });
     
     // Clean up on component unmount
     return () => {
-      gsap.ticker.remove(lenisRef.current?.raf);
-      lenisRef.current?.destroy();
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+      }
       
       // Kill all GSAP animations and ScrollTriggers
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -209,23 +220,27 @@ export default function FAQPage() {
         }
       );
     }
-  }, []);
+  }, [pageLoaded]);
 
   const toggleItem = (index: number) => {
+    // Update the state
     setOpenItems((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
     
-    // Scroll to the opened item with smooth animation
-    if (!openItems[index] && lenisRef.current) {
+    // If opening an item and not currently scrolling, scroll to it
+    if (!openItems[index] && lenisRef.current && !scrollInProgress.current) {
+      // Use a small delay to allow the content to start expanding
       setTimeout(() => {
         const element = document.getElementById(`faq-item-${index}`);
         if (element) {
+          // Use gentler scroll settings
           lenisRef.current?.scrollTo(element, { 
             offset: -100, 
-            duration: 1, 
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            duration: 0.8, // Shorter duration to feel more responsive
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            immediate: false, // Don't force immediate scroll
           });
         }
       }, 50);
@@ -261,7 +276,7 @@ export default function FAQPage() {
       question: "What is the benefit of Online and Offline Class?",
       answer: (
         <div>
-          <p>Since most of what we teach involves animation, delay, lags, or online video compression may break what is shown.</p>
+          <p>Since most of what we teach involves animation; delay, lags, or online video compression may break what is shown.</p>
           
           <p className="font-semibold mt-4">Offline Class:</p>
           <ul className="list-disc ml-6 space-y-1">
@@ -289,7 +304,7 @@ export default function FAQPage() {
     },
     {
       question: "Should I bring my laptop to Offline Class?",
-      answer: "Not necessary. We provide computers and softwares needed for the courses. But, we recommend you to bring a flash disk with at least 16 GB storage to take your work home and vice versa.",
+      answer: "Not necessary. We provide computers and softwares needed for the courses. However, we recommend you to bring a flash disk with at least 16 GB storage to take your work home and vice versa.",
     },
     {
       question: "What is the recommended Age to take our courses?",
@@ -306,7 +321,7 @@ export default function FAQPage() {
             https://www.linkedin.com/in/fredy-tan-5591a885/
           </EnhancedLink>
           
-          <p className="mt-2">For 2D motion Design:</p>
+          <p className="mt-2">For 2D Motion Design:</p>
           <EnhancedLink
             href="https://www.linkedin.com/in/novi-jingga-3ba074a5/"
           >
