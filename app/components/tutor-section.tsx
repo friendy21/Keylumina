@@ -345,7 +345,6 @@ export function TutorSection() {
     <div 
       ref={sectionRef}
       className="relative bg-[#d9c9e6] flex flex-col items-center justify-center py-16 w-full overflow-hidden"
-      style={{ marginBottom: "-1px" }} /* This ensures no gap between sections */
     >
       {/* Background without animation */}
       <div 
@@ -365,7 +364,7 @@ export function TutorSection() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Novi's card (left-aligned image) */}
           <TutorCard tutor={tutors[0]} alignment="left" index={0} />
           
