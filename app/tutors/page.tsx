@@ -38,6 +38,7 @@ const ContentWrapper = ({ children }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
+          className="flex flex-col min-h-screen"
         >
           {children}
         </motion.div>
@@ -57,26 +58,21 @@ export default function TutorsPage() {
     const handleRouteChangeStart = () => setPageLoaded(false)
     const handleRouteChangeComplete = () => setPageLoaded(true)
     
-    // Add event listeners for route changes if using Next.js router
-    // This is commented out since your file doesn't show router import
-    // Router.events.on('routeChangeStart', handleRouteChangeStart)
-    // Router.events.on('routeChangeComplete', handleRouteChangeComplete)
-    
     // Clean up event listeners
-    // return () => {
-    //   Router.events.off('routeChangeStart', handleRouteChangeStart)
-    //   Router.events.off('routeChangeComplete', handleRouteChangeComplete)
-    // }
+    return () => {
+      // Router cleanup would go here if using Next.js router
+    }
   }, [])
 
   return (
     <ContentWrapper>
-      <div className="min-h-screen bg-[#fff8d9] mt-[65px]">
+      <div className="flex flex-col min-h-screen bg-[#660099]">
         <Navigation />
-        <TutorSection />
+        <main className="flex-grow flex flex-col bg-[#d9c9e6]">
+          <TutorSection />
+        </main>
         <Footer />
       </div>
     </ContentWrapper>
   )
-
 }
