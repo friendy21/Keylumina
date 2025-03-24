@@ -90,23 +90,15 @@ function Module({ number, title, content, isOpen, onToggle, levelIndex, moduleIn
   }, [levelIndex, moduleIndex])
 
   return (
-<<<<<<< HEAD
     <div ref={moduleRef} id={`module-${levelIndex}-${moduleIndex}`} className="border-b border-gray-200 module-item">
-=======
-    <div className="border-b border-gray-200 module-item">
->>>>>>> 2d01374a8f304fc4324c5024b117561a92ac36fb
       <div className="py-4 flex justify-between items-start cursor-pointer" onClick={onToggle}>
         <h3 className="text-gray-800 font-medium flex-grow pr-4 whitespace-normal">
           Module {number}: {title}
         </h3>
-<<<<<<< HEAD
         <button 
           className="text-gray-500 p-1 rounded-full bg-purple-100 flex-shrink-0 mt-1 transition-colors hover:bg-purple-200"
           aria-label={isOpen ? "Close module" : "Open module"}
         >
-=======
-        <button className="text-gray-500 p-1 rounded-full bg-purple-100 flex-shrink-0 mt-1">
->>>>>>> 2d01374a8f304fc4324c5024b117561a92ac36fb
           {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </button>
       </div>
