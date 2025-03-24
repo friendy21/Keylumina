@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 
-// Loading spinner component
+// Loading spinner component - centered and fixed size
 const VideoLoadingSpinner = () => (
   <div className="absolute inset-0 flex items-center justify-center bg-[#FFFDF7] z-20">
-    <div className="relative">
+    <div className="flex flex-col items-center justify-center">
       <div className="w-16 h-16 border-4 border-[#d48fb6] border-t-[#660099] rounded-full animate-spin"></div>
       <div className="mt-4 text-[#660099] font-semibold text-center">Loading Video...</div>
     </div>
@@ -16,9 +16,10 @@ const VideoLoadingSpinner = () => (
 // Scroll down arrow component
 const ScrollDownArrow = () => {
   const controls = useAnimation();
-  const [hasScrolled, setHasScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    // Start the bounce animation
     controls.start({
       y: [0, 10, 0],
       transition: {
@@ -28,10 +29,13 @@ const ScrollDownArrow = () => {
       }
     });
     
-    // Handle scroll event
+    // Handle scroll event to show/hide arrow based on scroll position
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setHasScrolled(true);
+      // Show when at top, hide when scrolled down
+      if (window.scrollY <= 50) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
       }
     };
     
@@ -44,44 +48,50 @@ const ScrollDownArrow = () => {
     };
   }, [controls]);
 
-  // If user has scrolled, don't show the arrow
-  if (hasScrolled) {
-    return null;
-  }
+  const handleClick = () => {
+    // Improved smooth scrolling with better target calculation
+    const targetPosition = Math.min(
+      document.documentElement.scrollHeight - window.innerHeight,
+      window.innerHeight
+    );
+    
+    window.scrollTo({
+      top: targetPosition,
+      behavior: 'smooth'
+    });
+  };
 
   return (
-    <motion.div 
-      className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center text-white cursor-pointer z-30"
-      animate={controls}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={() => {
-        window.scrollTo({
-          top: window.innerHeight,
-          behavior: 'smooth'
-        });
-        setHasScrolled(true);
-      }}
-    >
-      <div className="text-sm font-medium mb-2">Scroll Down</div>
-      <svg 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-        className="animate-pulse"
-      >
-        <path 
-          d="M12 5V19M12 19L5 12M12 19L19 12" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-      </svg>
-    </motion.div>
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div 
+          className="absolute left-1/2 bottom-8 transform -translate-x-1/2 flex flex-col items-center text-white cursor-pointer z-30"
+          animate={controls}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={handleClick}
+        >
+          <div className="text-lg font-medium mb-3">Scroll Down</div>
+          <svg 
+            width="36" 
+            height="36" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            className="animate-pulse"
+          >
+            <path 
+              d="M12 5V19M12 19L5 12M12 19L19 12" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -190,27 +200,28 @@ export const ResponsiveBackground: React.FC = () => {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Loading Spinner */}
+      {/* Loading Spinner - now fixed directly in the center */}
       <AnimatePresence>
         {isVideoLoading && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
+            className="fixed inset-0 flex items-center justify-center z-50"
           >
             <VideoLoadingSpinner />
           </motion.div>
         )}
       </AnimatePresence>
       
-      {/* Main Background Video - Full Size and possibly blurred */}
+      {/* Main Background Video - Full Size when desktop, blurred and darkened otherwise */}
       <div className="absolute inset-0 w-full h-full z-0">
         <video 
           ref={mainVideoRef}
           className={`w-full h-full object-cover transition-opacity duration-1000 ${
             isVideoReady ? 'opacity-100' : 'opacity-0'
           } ${
-            viewportSize === 'desktop' ? '' : 'filter blur-xl'
+            viewportSize === 'desktop' ? '' : 'filter blur-xl brightness-[0.2]'
           }`}
           autoPlay
           muted
@@ -221,6 +232,11 @@ export const ResponsiveBackground: React.FC = () => {
           <source src="/Screen_Web.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+        
+        {/* Additional dark overlay for non-desktop viewports */}
+        {viewportSize !== 'desktop' && (
+          <div className="absolute inset-0 bg-black opacity-70 z-1"></div>
+        )}
       </div>
       
       {/* Tablet View - Scaled to 80% in the center */}
@@ -279,12 +295,8 @@ export const ResponsiveBackground: React.FC = () => {
         </div>
       )}
       
-      {/* Scroll Down Arrow - visible on all device sizes only until first scroll */}
-      {isVideoReady && !isVideoLoading && (
-        <AnimatePresence>
-          <ScrollDownArrow />
-        </AnimatePresence>
-      )}
+      {/* Scroll Down Arrow - visible at top of page, reappears when user scrolls back up */}
+      {isVideoReady && !isVideoLoading && <ScrollDownArrow />}
     </section>
   );
 };
