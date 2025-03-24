@@ -7,6 +7,7 @@ import { Footer } from "@/app/components/footer"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Lenis from "@studio-freight/lenis"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Register the ScrollTrigger plugin with GSAP
 if (typeof window !== 'undefined') {
@@ -22,13 +23,34 @@ function ModuleContent({ isOpen, content }: ModuleContentProps) {
   if (!isOpen) return null
 
   return (
-    <div className="py-4 pl-4 module-content">
-      {content.map((item, index) => (
-        <p key={index} className="text-gray-600 mb-1 text-sm">
-          {item}
-        </p>
-      ))}
-    </div>
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ 
+        height: "auto", 
+        opacity: 1,
+        transition: { 
+          height: { duration: 0.25, ease: [0.33, 1, 0.68, 1] },
+          opacity: { duration: 0.2, delay: 0.05 }
+        }
+      }}
+      exit={{ 
+        height: 0, 
+        opacity: 0,
+        transition: { 
+          height: { duration: 0.2, ease: [0.33, 1, 0.68, 1] },
+          opacity: { duration: 0.15 }
+        }
+      }}
+      className="overflow-hidden"
+    >
+      <div className="py-4 pl-4 module-content">
+        {content.map((item, index) => (
+          <p key={index} className="text-gray-600 mb-1 text-sm">
+            {item}
+          </p>
+        ))}
+      </div>
+    </motion.div>
   )
 }
 
@@ -38,20 +60,59 @@ interface ModuleProps {
   content: string[]
   isOpen: boolean
   onToggle: () => void
+  levelIndex: number
+  moduleIndex: number
 }
 
-function Module({ number, title, content, isOpen, onToggle }: ModuleProps) {
+function Module({ number, title, content, isOpen, onToggle, levelIndex, moduleIndex }: ModuleProps) {
+  const moduleRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (moduleRef.current) {
+      gsap.fromTo(
+        moduleRef.current,
+        { opacity: 0, y: 15 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.5, 
+          delay: (levelIndex * 0.05) + (moduleIndex * 0.03),
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: moduleRef.current,
+            start: "top bottom-=50",
+            toggleActions: "play none none none",
+            once: true
+          }
+        }
+      )
+    }
+  }, [levelIndex, moduleIndex])
+
   return (
+<<<<<<< HEAD
+    <div ref={moduleRef} id={`module-${levelIndex}-${moduleIndex}`} className="border-b border-gray-200 module-item">
+=======
     <div className="border-b border-gray-200 module-item">
+>>>>>>> 2d01374a8f304fc4324c5024b117561a92ac36fb
       <div className="py-4 flex justify-between items-start cursor-pointer" onClick={onToggle}>
         <h3 className="text-gray-800 font-medium flex-grow pr-4 whitespace-normal">
           Module {number}: {title}
         </h3>
+<<<<<<< HEAD
+        <button 
+          className="text-gray-500 p-1 rounded-full bg-purple-100 flex-shrink-0 mt-1 transition-colors hover:bg-purple-200"
+          aria-label={isOpen ? "Close module" : "Open module"}
+        >
+=======
         <button className="text-gray-500 p-1 rounded-full bg-purple-100 flex-shrink-0 mt-1">
+>>>>>>> 2d01374a8f304fc4324c5024b117561a92ac36fb
           {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </button>
       </div>
-      <ModuleContent isOpen={isOpen} content={content} />
+      <AnimatePresence initial={false}>
+        {isOpen && <ModuleContent isOpen={isOpen} content={content} />}
+      </AnimatePresence>
     </div>
   )
 }
@@ -72,102 +133,116 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   const [openModules, setOpenModules] = useState<{ [key: string]: boolean }>({})
   const lenisRef = useRef<Lenis | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const scrollInProgress = useRef(false)
+  const rafId = useRef<number | null>(null)
 
   // Initialize Lenis for smooth scrolling
   useEffect(() => {
-    // Create new Lenis instance
+    // Create new Lenis instance with optimized settings
     lenisRef.current = new Lenis({
-      duration: 1.2,           // Animation duration
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Improved easing function
-      direction: 'vertical',   // Scroll direction
+      duration: 0.8,           // Reduced duration for more responsive feeling
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
       gestureDirection: 'vertical',
-      smooth: true,            // Enable smooth scrolling
-      smoothTouch: false,      // Disable on touch devices
-      touchMultiplier: 2,      // Touch sensitivity
-      infinite: false,         // No infinite scrolling
-      syncTouch: true,         // Sync with touch events
-      wheelMultiplier: 1,      // Wheel sensitivity
-      lerp: 0.1,               // Linear interpolation factor (lower = smoother)
-      orientation: 'vertical', // Scroll orientation
+      smooth: true,
+      smoothTouch: false,      
+      touchMultiplier: 2,      
+      infinite: false,
+      lerp: 0.08,              // Optimized linear interpolation factor
+      wheelMultiplier: 1,
+      orientation: 'vertical',
     })
 
     // GSAP ScrollTrigger integration
-    lenisRef.current.on('scroll', ScrollTrigger.update)
+    lenisRef.current.on('scroll', ({ velocity }) => {
+      ScrollTrigger.update()
+      scrollInProgress.current = Math.abs(velocity) > 0.1
+    })
 
     // Bind Lenis to requestAnimationFrame for optimal performance
     function raf(time: number) {
       lenisRef.current?.raf(time)
-      requestAnimationFrame(raf)
+      rafId.current = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf)
+    rafId.current = requestAnimationFrame(raf)
 
-    // Create stagger animations for module items
+    // Configure GSAP for high performance
+    gsap.config({
+      force3D: true,
+      nullTargetWarn: false,
+    })
+
+    // Only animate module items once on initial load
     if (containerRef.current) {
       const moduleItems = containerRef.current.querySelectorAll('.module-item')
       
-      gsap.fromTo(
-        moduleItems,
-        { 
-          opacity: 0,
-          y: 20
-        },
-        { 
+      gsap.set(moduleItems, { opacity: 0, y: 20 })
+      
+      ScrollTrigger.batch(moduleItems, {
+        interval: 0.05,
+        batchMax: 3,  // Process max 3 items per batch for smoother performance
+        onEnter: batch => gsap.to(batch, {
           opacity: 1,
           y: 0,
           stagger: 0.05,
           duration: 0.5,
           ease: "power2.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-            toggleActions: "play none none none"
-          }
-        }
-      )
+        }),
+        start: "top 85%",
+        once: true
+      })
     }
 
     // Cleanup on unmount
     return () => {
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current)
+      }
+      
       lenisRef.current?.destroy()
+      
+      // Kill all GSAP animations and ScrollTriggers
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      gsap.killTweensOf("*")
     }
   }, [])
 
-  // Handle module content expansion with GSAP animation
-  useEffect(() => {
-    const moduleContents = document.querySelectorAll('.module-content')
-    
-    moduleContents.forEach(content => {
-      gsap.fromTo(
-        content,
-        { height: 0, opacity: 0 },
-        { 
-          height: 'auto', 
-          opacity: 1, 
-          duration: 0.3, 
-          ease: "power2.out",
-          onComplete: () => {
-            // Update Lenis and ScrollTrigger after animation
-            lenisRef.current?.resize()
-            ScrollTrigger.refresh()
-          }
-        }
-      )
-    })
-  }, [openModules])
-
+  // Handle module toggle with smooth scroll
   const toggleModule = (levelIndex: number, moduleIndex: number) => {
     const key = `${levelIndex}-${moduleIndex}`
+    const wasOpen = !!openModules[key]
+    
     setOpenModules(prev => {
-      const newState = { ...prev, [key]: !prev[key] }
-      // We need to update Lenis after state change
+      return { ...prev, [key]: !prev[key] }
+    })
+
+    // If we're opening a module and not currently scrolling, scroll to it
+    if (!wasOpen && !scrollInProgress.current && lenisRef.current) {
+      // Small delay to allow state update and initial render
+      setTimeout(() => {
+        const element = document.getElementById(`module-${levelIndex}-${moduleIndex}`)
+        if (element) {
+          lenisRef.current?.scrollTo(element, {
+            offset: -100,
+            duration: 0.6,
+            immediate: false
+          })
+        }
+        
+        // Force Lenis to update its size after animation completes
+        setTimeout(() => {
+          lenisRef.current?.resize()
+          ScrollTrigger.refresh(true)
+        }, 350) // Slightly longer than animation duration
+      }, 50)
+    } else {
+      // If closing, still need to update Lenis after animation finishes
       setTimeout(() => {
         lenisRef.current?.resize()
-      }, 50)
-      return newState
-    })
+        ScrollTrigger.refresh(true)
+      }, 300)
+    }
   }
-
 
   const courseData = {
     "Intro-AE-Course": {
@@ -307,7 +382,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             {
               number: 9,
               title: "Workflow and Soft Skill",
-              content: ["Learn how to determine correct workflow, improving soft skill, and other important knowledge regarding career in 3D animation industry"],
+              content: ["Learn how to determine correct workflow, improving soft skill, and other important knowledge regarding career in industry"],
             }
           ]
         },
@@ -675,6 +750,11 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     }
   }
 
+  const defaultCourse = {
+    title: "Course Not Found",
+    levels: [{ modules: [] }]
+  }
+
   const course = courseData[courseId as keyof typeof courseData] || defaultCourse
   const hasMultipleLevels = course.levels.length > 1
 
@@ -690,18 +770,33 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             <ArrowRight className="mr-2 rotate-180" /> Back
           </button>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">KeyLumina Course Module</h1>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">{course.title}</h2>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">KeyLumina Course Module</h1>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{course.title}</h2>
+          </motion.div>
 
           {course.levels.map((level, levelIndex) => (
             <div key={levelIndex} className="mb-8">
               {/* Only show the level header if there are multiple levels */}
               {hasMultipleLevels && (
-                <div className="bg-purple-50 p-4 rounded-lg mb-4">
+                <motion.div 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: levelIndex * 0.1,
+                    ease: "easeOut" 
+                  }}
+                  className="bg-purple-50 p-4 rounded-lg mb-4"
+                >
                   <h2 className="text-xl font-semibold text-purple-800">
                     {level.title || `Level ${levelIndex + 1}`}
                   </h2>
-                </div>
+                </motion.div>
               )}
               
               {level.modules.map((module, moduleIndex) => (
@@ -712,6 +807,8 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                   content={module.content}
                   isOpen={!!openModules[`${levelIndex}-${moduleIndex}`]}
                   onToggle={() => toggleModule(levelIndex, moduleIndex)}
+                  levelIndex={levelIndex}
+                  moduleIndex={moduleIndex}
                 />
               ))}
             </div>
