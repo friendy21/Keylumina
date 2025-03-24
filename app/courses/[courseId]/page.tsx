@@ -43,11 +43,11 @@ interface ModuleProps {
 function Module({ number, title, content, isOpen, onToggle }: ModuleProps) {
   return (
     <div className="border-b border-gray-200 module-item">
-      <div className="py-4 flex justify-between items-center cursor-pointer" onClick={onToggle}>
-        <h3 className="text-gray-800 font-medium">
-          Modul {number}: {title}
+      <div className="py-4 flex justify-between items-start cursor-pointer" onClick={onToggle}>
+        <h3 className="text-gray-800 font-medium flex-grow pr-4 whitespace-normal">
+          Module {number}: {title}
         </h3>
-        <button className="text-gray-500 p-1 rounded-full bg-purple-100">
+        <button className="text-gray-500 p-1 rounded-full bg-purple-100 flex-shrink-0 mt-1">
           {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </button>
       </div>
