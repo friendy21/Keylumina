@@ -29,16 +29,16 @@ function ModuleContent({ isOpen, content }: ModuleContentProps) {
         height: "auto", 
         opacity: 1,
         transition: { 
-          height: { duration: 0.25, ease: [0.33, 1, 0.68, 1] },
-          opacity: { duration: 0.2, delay: 0.05 }
+          height: { duration: 0.3, ease: "easeOut" },
+          opacity: { duration: 0.2, delay: 0.1 }
         }
       }}
       exit={{ 
         height: 0, 
         opacity: 0,
         transition: { 
-          height: { duration: 0.2, ease: [0.33, 1, 0.68, 1] },
-          opacity: { duration: 0.15 }
+          height: { duration: 0.2, ease: "easeOut" },
+          opacity: { duration: 0.1 }
         }
       }}
       className="overflow-hidden"
@@ -125,40 +125,37 @@ export default function CoursePage({ params }: { params: { courseId: string } })
   const [openModules, setOpenModules] = useState<{ [key: string]: boolean }>({})
   const lenisRef = useRef<Lenis | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const scrollInProgress = useRef(false)
-  const rafId = useRef<number | null>(null)
 
-  // Initialize Lenis for smooth scrolling
+  // Initialize Lenis for smooth scrolling but with modified settings
   useEffect(() => {
-    // Create new Lenis instance with optimized settings
+    // Create new Lenis instance with gentler settings
     lenisRef.current = new Lenis({
-      duration: 0.8,           // Reduced duration for more responsive feeling
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 1.2,           // Increased for smoother, less jarring motion
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Ease out exponential
       direction: 'vertical',
       gestureDirection: 'vertical',
       smooth: true,
       smoothTouch: false,      
       touchMultiplier: 2,      
       infinite: false,
-      lerp: 0.08,              // Optimized linear interpolation factor
-      wheelMultiplier: 1,
+      lerp: 0.05,              // Lower value for smoother transitions
+      wheelMultiplier: 0.8,    // Reduced for less aggressive wheel scrolling
       orientation: 'vertical',
     })
 
     // GSAP ScrollTrigger integration
-    lenisRef.current.on('scroll', ({ velocity }) => {
+    lenisRef.current.on('scroll', () => {
       ScrollTrigger.update()
-      scrollInProgress.current = Math.abs(velocity) > 0.1
     })
 
-    // Bind Lenis to requestAnimationFrame for optimal performance
+    // Bind Lenis to requestAnimationFrame
     function raf(time: number) {
       lenisRef.current?.raf(time)
-      rafId.current = requestAnimationFrame(raf)
+      requestAnimationFrame(raf)
     }
-    rafId.current = requestAnimationFrame(raf)
+    requestAnimationFrame(raf)
 
-    // Configure GSAP for high performance
+    // Configure GSAP
     gsap.config({
       force3D: true,
       nullTargetWarn: false,
@@ -172,7 +169,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
       
       ScrollTrigger.batch(moduleItems, {
         interval: 0.05,
-        batchMax: 3,  // Process max 3 items per batch for smoother performance
+        batchMax: 3,
         onEnter: batch => gsap.to(batch, {
           opacity: 1,
           y: 0,
@@ -187,10 +184,6 @@ export default function CoursePage({ params }: { params: { courseId: string } })
 
     // Cleanup on unmount
     return () => {
-      if (rafId.current) {
-        cancelAnimationFrame(rafId.current)
-      }
-      
       lenisRef.current?.destroy()
       
       // Kill all GSAP animations and ScrollTriggers
@@ -199,41 +192,19 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     }
   }, [])
 
-  // Handle module toggle with smooth scroll
+  // Handle module toggle without scroll behavior
   const toggleModule = (levelIndex: number, moduleIndex: number) => {
     const key = `${levelIndex}-${moduleIndex}`
-    const wasOpen = !!openModules[key]
     
     setOpenModules(prev => {
       return { ...prev, [key]: !prev[key] }
     })
 
-    // If we're opening a module and not currently scrolling, scroll to it
-    if (!wasOpen && !scrollInProgress.current && lenisRef.current) {
-      // Small delay to allow state update and initial render
-      setTimeout(() => {
-        const element = document.getElementById(`module-${levelIndex}-${moduleIndex}`)
-        if (element) {
-          lenisRef.current?.scrollTo(element, {
-            offset: -100,
-            duration: 0.6,
-            immediate: false
-          })
-        }
-        
-        // Force Lenis to update its size after animation completes
-        setTimeout(() => {
-          lenisRef.current?.resize()
-          ScrollTrigger.refresh(true)
-        }, 350) // Slightly longer than animation duration
-      }, 50)
-    } else {
-      // If closing, still need to update Lenis after animation finishes
-      setTimeout(() => {
-        lenisRef.current?.resize()
-        ScrollTrigger.refresh(true)
-      }, 300)
-    }
+    // Only update Lenis and ScrollTrigger after content height changes
+    setTimeout(() => {
+      lenisRef.current?.resize()
+      ScrollTrigger.refresh(true)
+    }, 350)
   }
 
   const courseData = {
