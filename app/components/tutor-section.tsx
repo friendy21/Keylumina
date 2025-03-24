@@ -118,7 +118,6 @@ function VideoThumbnail({ thumbnail, onClick }) {
 function TutorCard({ tutor, alignment = "left", index }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const isLeft = alignment === "left";
-  const isNovi = tutor.id === "novi-jingga";
   
   const cardRef = useRef(null);
   const imageRef = useRef(null);
@@ -183,8 +182,9 @@ function TutorCard({ tutor, alignment = "left", index }) {
       ref={cardRef}
       className="bg-[#fff8d9] rounded-lg overflow-hidden h-full flex flex-col md:flex-row hover:-translate-y-1 transition-transform duration-300 shadow-lg"
     >
+      {/* Image section - on mobile it's always at the top */}
       <div 
-        className={`md:w-1/2 ${isLeft ? "md:order-first" : "md:order-last"} relative overflow-hidden`}
+        className={`md:w-1/2 ${isLeft ? "md:order-first" : "md:order-last"} relative overflow-hidden order-first`}
         style={{ height: "auto" }}
       >
         <div ref={imageRef} className="w-full h-full absolute inset-0">
@@ -197,17 +197,17 @@ function TutorCard({ tutor, alignment = "left", index }) {
         <div style={{ paddingTop: "133%" }} className="relative w-full"></div>
       </div>
       
-      {/* Content section */}
+      {/* Content section - on mobile it's always below the image */}
       <motion.div 
-        className={`md:w-1/2 p-6 flex flex-col justify-between ${
+        className={`md:w-1/2 p-6 flex flex-col ${
           isLeft ? "md:order-last" : "md:order-first"
-        } h-full`}
+        } order-last h-full`}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Top section */}
-        <div className="flex flex-col h-full">
+        {/* Top section with name, role, description */}
+        <div className="flex flex-col flex-grow">
           <motion.div className="mb-2 flex items-center" variants={itemVariants}>
             <motion.h3 
               className="text-2xl font-bold mr-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-purple-600"
@@ -215,6 +215,26 @@ function TutorCard({ tutor, alignment = "left", index }) {
             >
               {tutor.name}
             </motion.h3>
+            {/* LinkedIn icon for both tutors */}
+            {tutor.linkedinUrl && (
+              <motion.a
+                href={tutor.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 mb-4 inline-block ml-auto"
+                variants={itemVariants}
+              >
+                <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="30" 
+                height="30" 
+                viewBox="0 0 24 24" 
+                fill="#0077b5"
+                >
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </motion.a>
+            )}
           </motion.div>
           
           <motion.p 
@@ -226,120 +246,42 @@ function TutorCard({ tutor, alignment = "left", index }) {
         
           {/* Description */}
           <motion.div 
-            className="text-gray-700 text-sm mb-4 flex-grow overflow-y-auto"
+            className="text-gray-700 text-sm mb-4"
             variants={itemVariants}
           >
             <p>{tutor.description}</p>
-            
-            {/* Modified section for Novi - LinkedIn icon first, then video */}
-            {isNovi ? (
-              <div className="flex flex-col">
-                {tutor.linkedinUrl && (
-                  <motion.a
-                    href={tutor.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 mb-4 inline-block"
-                    variants={itemVariants}
-                  >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="40" 
-                      height="40" 
-                      viewBox="0 0 24 24" 
-                      fill="#0077b5"
-                    >
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                    </svg>
-                  </motion.a>
-                )}
-                
-                {/* Video section for Novi moved here, directly below LinkedIn */}
-                <motion.div className="w-full mt-2" variants={itemVariants}>
-                  <AnimatePresence mode="wait">
-                    {isPlaying ? (
-                      <motion.div
-                        key="video"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                      >
-                        <VideoPlayer videoUrl={tutor.videoUrl} />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="thumbnail"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                      >
-                        <VideoThumbnail
-                          thumbnail={tutor.videoThumbnail}
-                          onClick={() => setIsPlaying(true)}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </div>
-            ) : (
-              /* Original LinkedIn icon for Fredy */
-              tutor.linkedinUrl && (
-                <motion.a
-                  href={tutor.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 inline-block"
-                  variants={itemVariants}
-                >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="40" 
-                    height="40" 
-                    viewBox="0 0 24 24" 
-                    fill="#0077b5"
-                  >
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                  </svg>
-                </motion.a>
-              )
-            )}
           </motion.div>
         </div>
         
-        {/* Video section for Fredy only (kept in original position) */}
-        {!isNovi && (
-          <motion.div className="w-full mt-auto" variants={itemVariants}>
-            <AnimatePresence mode="wait">
-              {isPlaying ? (
-                <motion.div
-                  key="video"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <VideoPlayer videoUrl={tutor.videoUrl} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="thumbnail"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <VideoThumbnail
-                    thumbnail={tutor.videoThumbnail}
-                    onClick={() => setIsPlaying(true)}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        )}
+        {/* Video section at the bottom for both tutors */}
+        <motion.div className="w-full mt-auto" variants={itemVariants}>
+          <AnimatePresence mode="wait">
+            {isPlaying ? (
+              <motion.div
+                key="video"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
+                <VideoPlayer videoUrl={tutor.videoUrl} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="thumbnail"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
+                <VideoThumbnail
+                  thumbnail={tutor.videoThumbnail}
+                  onClick={() => setIsPlaying(true)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -476,11 +418,11 @@ export function TutorSection() {
       {/* Background effects */}
       <div 
         ref={backgroundRef}
-        className="absolute inset-0 bg-gradient-to-b from-purple-100/30 to-transparent"
+        className="absolute inset-0 bg-[#d9c9e6] from-purple-100/30 to-transparent"
       />
       <BackgroundParticles />
       
-      <div className="container mx-auto px-6 w-full max-w-screen-2xl relative z-10">
+      <div className="container bg-[#d9c9e6] mx-auto px-6 w-full max-w-screen-2xl relative z-10">
         <div ref={titleRef}>
           <h1 className="mt-16 text-4xl md:text-5xl font-bold text-[#660099] mb-4 text-center">
             TUTORS
