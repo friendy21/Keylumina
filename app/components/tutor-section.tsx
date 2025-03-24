@@ -141,8 +141,6 @@ function TutorCard({ tutor, alignment = "left", index }) {
         }
       }
     );
-    
-    // Removed all parallax effects for the image
   }, []);
   
   // Staggered animation variants for Framer Motion elements
@@ -182,7 +180,6 @@ function TutorCard({ tutor, alignment = "left", index }) {
           className="w-full h-full object-contain transition-all duration-700"
           style={{ maxHeight: "100%", width: "100%" }}
         />
-        {/* Removed the padding-top spacer div that was causing issues */}
       </div>
       
       {/* Content section - on mobile it's always below the image */}
@@ -303,8 +300,6 @@ export function TutorSection() {
     // Bind Lenis to requestAnimationFrame for high FPS
     requestAnimationFrame(raf);
     
-    // Removed background parallax animation
-    
     // Animate title and subtitle
     gsap.fromTo(
       titleRef.current,
@@ -349,7 +344,8 @@ export function TutorSection() {
   return (
     <div 
       ref={sectionRef}
-      className="relative bg-[#d9c9e6] flex flex-col items-center justify-center py-20 w-full overflow-hidden"
+      className="relative bg-[#d9c9e6] flex flex-col items-center justify-center py-16 w-full overflow-hidden"
+      style={{ marginBottom: "-1px" }} /* This ensures no gap between sections */
     >
       {/* Background without animation */}
       <div 
@@ -358,7 +354,7 @@ export function TutorSection() {
       
       <div className="container bg-[#d9c9e6] mx-auto px-6 w-full max-w-screen-2xl relative z-10">
         <div ref={titleRef}>
-          <h1 className="mt-16 text-4xl md:text-5xl font-bold text-[#660099] mb-4 text-center">
+          <h1 className="mt-4 text-4xl md:text-5xl font-bold text-[#660099] mb-4 text-center">
             TUTORS
           </h1>
         </div>
@@ -369,7 +365,7 @@ export function TutorSection() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Novi's card (left-aligned image) */}
           <TutorCard tutor={tutors[0]} alignment="left" index={0} />
           
