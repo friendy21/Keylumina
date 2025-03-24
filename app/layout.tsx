@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Keylumina Media School",
+  title: "KeyLumina Media School",
   description: "Learn motion design and CG from zero to pro",
   icons: {
     icon: '/KMS_Icon.png',
