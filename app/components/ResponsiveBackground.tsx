@@ -214,14 +214,12 @@ export const ResponsiveBackground: React.FC = () => {
         )}
       </AnimatePresence>
       
-      {/* Main Background Video - Full Size when desktop, blurred and darkened otherwise */}
+      {/* Main Background Video - Full Size without blur */}
       <div className="absolute inset-0 w-full h-full z-0">
         <video 
           ref={mainVideoRef}
           className={`w-full h-full object-cover transition-opacity duration-1000 ${
             isVideoReady ? 'opacity-100' : 'opacity-0'
-          } ${
-            viewportSize === 'desktop' ? '' : 'filter blur-xl brightness-[0.2]'
           }`}
           autoPlay
           muted
@@ -229,69 +227,41 @@ export const ResponsiveBackground: React.FC = () => {
           playsInline
           preload="auto"
         >
-          <source src="/Screen_Web.mp4" type="video/mp4" />
+          <source src="/Screen_Web_02.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        
-        {/* Additional dark overlay for non-desktop viewports */}
-        {viewportSize !== 'desktop' && (
-          <div className="absolute inset-0 bg-black opacity-70 z-1"></div>
-        )}
       </div>
       
-      {/* Tablet View - Scaled to 80% in the center */}
+      {/* Logo Overlay - Centered on all viewport sizes */}
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: isVideoReady ? 1 : 0, scale: isVideoReady ? 1 : 0.8 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className={`${
+            viewportSize === 'mobile' ? 'w-full' : 
+            viewportSize === 'tablet' ? 'w-full' : 'w-2/3'
+          } h-auto`}
+        >
+          <img 
+            src="/Screen_Web_logo.png" 
+            alt="Logo" 
+            className="w-full h-auto object-contain"
+          />
+        </motion.div>
+      </div>
+      
+      {/* Tablet View - No separate video, using main background */}
       {viewportSize === 'tablet' && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: isVideoReady ? 1 : 0, scale: isVideoReady ? 1 : 0.8 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-[80%] aspect-video" 
-            style={{
-              transformOrigin: 'center'
-            }}
-          >
-            <video 
-              ref={tabletVideoRef}
-              className="w-full h-full object-cover rounded-lg shadow-xl"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-            >
-              <source src="/Screen_Web.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </motion.div>
+        <div className="absolute inset-0 flex items-center justify-center z-5">
+          {/* Removed separate video element for tablet view */}
         </div>
       )}
       
-      {/* Mobile View - Scaled to 100% width with rounded corners */}
+      {/* Mobile View - No separate video, using main background */}
       {viewportSize === 'mobile' && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: isVideoReady ? 1 : 0, scale: isVideoReady ? 1 : 0.8 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-[100%] aspect-video" 
-            style={{
-              transformOrigin: 'center'
-            }}
-          >
-            <video 
-              ref={mobileVideoRef}
-              className="w-full h-full object-cover rounded-lg shadow-2xl"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-            >
-              <source src="/Screen_Web.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </motion.div>
+        <div className="absolute inset-0 flex items-center justify-center z-5">
+          {/* Removed separate video element for mobile view */}
         </div>
       )}
       
