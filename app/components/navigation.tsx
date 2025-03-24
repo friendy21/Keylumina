@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronDown, Menu, X, Phone, Mail, Instagram } from "lucide-react"
+import { ChevronDown, Menu, X, Phone, Mail, Instagram, FileText } from "lucide-react"
 import { EmailForm } from "./contact-forms/email-form"
 import Image from "next/image"
 import { AnimatePresence, motion } from "framer-motion"
@@ -36,7 +36,7 @@ export function Navigation() {
   }
 
   // WhatsApp link with pre-filled message
-  const whatsappLink = "https://wa.me/6287886928285?text=Hi%2C%20I%20Am%20Interested%20In%20Learning%20the%20Keylumina%20Class%20Course"
+  // const whatsappLink = "https://wa.me/6287886928285?text=Hi%2C%20I%20Am%20Interested%20In%20Learning%20the%20Keylumina%20Class%20Course"
   const tiktokLink = "https://www.tiktok.com/@keylumina"
   const instagramLink = "https://www.instagram.com/keylumina/"
   const registrationLink = "https://docs.google.com/forms/d/e/1FAIpQLScM2CFULJen8j9OlYQXCMiufV_FqKjIuDn7XytBZ6FDY5wXQQ/viewform"
@@ -114,6 +114,16 @@ export function Navigation() {
     }
   }
 
+  // Hover effect for dropdown items
+  const dropdownItemHover = {
+    rest: { backgroundColor: "transparent" },
+    hover: { 
+      backgroundColor: "#4d0073", 
+      x: 3,
+      transition: { duration: 0.2 }
+    }
+  }
+
   return (
     <>
       <motion.header 
@@ -136,9 +146,9 @@ export function Navigation() {
                 variants={logoVariants}
               >
                 <Link href="/" className="text-white font-bold flex items-center">
-                  <div className="rounded-full overflow-hidden w-30 h-30 mr-2 mt-[50px] flex items-center justify-center bg-white">
+                  <div className="rounded-full overflow-hidden w-30 h-30 mr-2 mt-[57px] flex items-center justify-center bg-white">
                     <Image
-                      src="/KMS_Icon.png?height=120&width=120"
+                      src="/KMS_Logo_crop.png?height=120&width=120"
                       alt="Keylumina Logo"
                       width={120}
                       height={120}
@@ -196,22 +206,6 @@ export function Navigation() {
                 </Link>
               </motion.div>
 
-              <motion.div
-                variants={navItemVariants}
-                initial="hidden"
-                animate="visible"
-                custom={3}
-              >
-                <Link 
-                  href={registrationLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-white hover:text-[#FBCF41] transition-colors"
-                >
-                  <motion.span whileHover={{ scale: 1.05 }} className="inline-block">REGISTRATION</motion.span>
-                </Link>
-              </motion.div>
-
               {/* Contact dropdown with animation */}
               <motion.div
                 variants={navItemVariants}
@@ -243,16 +237,27 @@ export function Navigation() {
                       animate="visible"
                       exit="exit"
                     >
-                      <motion.button
+                      <motion.div
                         variants={menuItemVariants}
-                        onClick={() => openContactForm("email")}
-                        className="block w-full text-left px-4 py-2 text-white hover:bg-[#4d0073] flex items-center"
-                        whileHover={{ backgroundColor: "#4d0073", x: 3 }}
+                        initial="rest"
+                        whileHover="hover"
+                        animate="rest"
                       >
-                        <Mail className="h-4 w-4 mr-2" /> Email
-                      </motion.button>
+                        <motion.button
+                          onClick={() => openContactForm("email")}
+                          className="block w-full text-left px-4 py-2 text-white hover:bg-[#4d0073] flex items-center"
+                          variants={dropdownItemHover}
+                        >
+                          <Mail className="h-4 w-4 mr-2" /> Email
+                        </motion.button>
+                      </motion.div>
                       
-                      <motion.div variants={menuItemVariants}>
+                      {/* <motion.div 
+                        variants={menuItemVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        animate="rest"
+                      >
                         <Link
                           href={whatsappLink}
                           target="_blank"
@@ -261,14 +266,19 @@ export function Navigation() {
                         >
                           <motion.div
                             className="flex items-center w-full"
-                            whileHover={{ backgroundColor: "#4d0073", x: 3 }}
+                            variants={dropdownItemHover}
                           >
                             <Phone className="h-4 w-4 mr-2" /> WhatsApp
                           </motion.div>
                         </Link>
-                      </motion.div>
+                      </motion.div> */}
                       
-                      <motion.div variants={menuItemVariants}>
+                      <motion.div 
+                        variants={menuItemVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        animate="rest"
+                      >
                         <Link
                           href={instagramLink}
                           target="_blank"
@@ -277,14 +287,19 @@ export function Navigation() {
                         >
                           <motion.div
                             className="flex items-center w-full"
-                            whileHover={{ backgroundColor: "#4d0073", x: 3 }}
+                            variants={dropdownItemHover}
                           >
                             <Instagram className="h-4 w-4 mr-2" /> Instagram
                           </motion.div>
                         </Link>
                       </motion.div>
                       
-                      <motion.div variants={menuItemVariants}>
+                      <motion.div 
+                        variants={menuItemVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        animate="rest"
+                      >
                         <Link
                           href={tiktokLink}
                           target="_blank"
@@ -293,7 +308,7 @@ export function Navigation() {
                         >
                           <motion.div
                             className="flex items-center w-full"
-                            whileHover={{ backgroundColor: "#4d0073", x: 3 }}
+                            variants={dropdownItemHover}
                           >
                             <svg 
                               className="h-4 w-4 mr-2" 
@@ -303,6 +318,28 @@ export function Navigation() {
                             >
                               <path d="M19.321 5.562a5.124 5.124 0 0 1-.828-1.979h.002v-.464H15.31v12.033c0 1.303-1.038 2.36-2.34 2.385a2.34 2.34 0 0 1-1.384-.432 2.342 2.342 0 0 1-.957-1.953c0-1.296 1.051-2.345 2.346-2.345.257 0 .505.042.738.118v-3.21a5.532 5.532 0 0 0-.955-.085c-3.052 0-5.536 2.484-5.536 5.536 0 1.753.818 3.308 2.091 4.32a5.516 5.516 0 0 0 3.445 1.217c3.052 0 5.537-2.484 5.537-5.536V9.971a8.235 8.235 0 0 0 4.682 1.454V8.251a4.956 4.956 0 0 1-2.656-2.689z" />
                             </svg> TikTok
+                          </motion.div>
+                        </Link>
+                      </motion.div>
+                      
+                      {/* Added Registration Link to the contact dropdown with improved hover */}
+                      <motion.div 
+                        variants={menuItemVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        animate="rest"
+                      >
+                        <Link
+                          href={registrationLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full text-left px-4 py-2 text-white hover:bg-[#4d0073] flex items-center"
+                        >
+                          <motion.div
+                            className="flex items-center w-full"
+                            variants={dropdownItemHover}
+                          >
+                            <FileText className="h-4 w-4 mr-2" /> Registration
                           </motion.div>
                         </Link>
                       </motion.div>
@@ -365,18 +402,6 @@ export function Navigation() {
                       <motion.div whileHover={{ x: 5 }}>COURSES</motion.div>
                     </Link>
                   </motion.div>
-                  
-                  <motion.div variants={menuItemVariants}>
-                    <Link
-                      href={registrationLink}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-white hover:text-[#FBCF41] transition-colors px-4 py-2 block"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <motion.div whileHover={{ x: 5 }}>REGISTRATION</motion.div>
-                    </Link>
-                  </motion.div>
 
                   {/* Mobile contact options with animation */}
                   <motion.div variants={menuItemVariants} className="px-4">
@@ -402,19 +427,30 @@ export function Navigation() {
                           animate="visible"
                           exit="exit"
                         >
-                          <motion.button
+                          <motion.div 
                             variants={menuItemVariants}
-                            onClick={() => {
-                              openContactForm("email")
-                              setMobileMenuOpen(false)
-                            }}
-                            className="block w-full text-left py-1 text-white hover:text-[#FBCF41] flex items-center"
-                            whileHover={{ x: 3 }}
+                            initial="rest"
+                            whileHover="hover"
+                            animate="rest"
                           >
-                            <Mail className="h-4 w-4 mr-2" /> Email
-                          </motion.button>
+                            <motion.button
+                              onClick={() => {
+                                openContactForm("email")
+                                setMobileMenuOpen(false)
+                              }}
+                              className="block w-full text-left py-1 text-white hover:text-[#FBCF41] flex items-center"
+                              variants={dropdownItemHover}
+                            >
+                              <Mail className="h-4 w-4 mr-2" /> Email
+                            </motion.button>
+                          </motion.div>
                           
-                          <motion.div variants={menuItemVariants}>
+                          {/* <motion.div 
+                            variants={menuItemVariants}
+                            initial="rest"
+                            whileHover="hover"
+                            animate="rest"
+                          >
                             <Link
                               href={whatsappLink}
                               target="_blank"
@@ -424,14 +460,19 @@ export function Navigation() {
                             >
                               <motion.div 
                                 className="flex items-center w-full"
-                                whileHover={{ x: 3 }}
+                                variants={dropdownItemHover}
                               >
                                 <Phone className="h-4 w-4 mr-2" /> WhatsApp
                               </motion.div>
                             </Link>
-                          </motion.div>
+                          </motion.div> */}
                           
-                          <motion.div variants={menuItemVariants}>
+                          <motion.div 
+                            variants={menuItemVariants}
+                            initial="rest"
+                            whileHover="hover"
+                            animate="rest"
+                          >
                             <Link
                               href={instagramLink}
                               target="_blank"
@@ -441,14 +482,19 @@ export function Navigation() {
                             >
                               <motion.div 
                                 className="flex items-center w-full"
-                                whileHover={{ x: 3 }}
+                                variants={dropdownItemHover}
                               >
                                 <Instagram className="h-4 w-4 mr-2" /> Instagram
                               </motion.div>
                             </Link>
                           </motion.div>
                           
-                          <motion.div variants={menuItemVariants}>
+                          <motion.div 
+                            variants={menuItemVariants}
+                            initial="rest"
+                            whileHover="hover"
+                            animate="rest"
+                          >
                             <Link
                               href={tiktokLink}
                               target="_blank"
@@ -458,7 +504,7 @@ export function Navigation() {
                             >
                               <motion.div 
                                 className="flex items-center w-full"
-                                whileHover={{ x: 3 }}
+                                variants={dropdownItemHover}
                               >
                                 <svg 
                                   className="h-4 w-4 mr-2" 
@@ -468,6 +514,29 @@ export function Navigation() {
                                 >
                                   <path d="M19.321 5.562a5.124 5.124 0 0 1-.828-1.979h.002v-.464H15.31v12.033c0 1.303-1.038 2.36-2.34 2.385a2.34 2.34 0 0 1-1.384-.432 2.342 2.342 0 0 1-.957-1.953c0-1.296 1.051-2.345 2.346-2.345.257 0 .505.042.738.118v-3.21a5.532 5.532 0 0 0-.955-.085c-3.052 0-5.536 2.484-5.536 5.536 0 1.753.818 3.308 2.091 4.32a5.516 5.516 0 0 0 3.445 1.217c3.052 0 5.537-2.484 5.537-5.536V9.971a8.235 8.235 0 0 0 4.682 1.454V8.251a4.956 4.956 0 0 1-2.656-2.689z" />
                                 </svg> TikTok
+                              </motion.div>
+                            </Link>
+                          </motion.div>
+                          
+                          {/* Added Registration Link to mobile contact dropdown with improved hover */}
+                          <motion.div 
+                            variants={menuItemVariants}
+                            initial="rest"
+                            whileHover="hover"
+                            animate="rest"
+                          >
+                            <Link
+                              href={registrationLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block w-full text-left py-1 text-white hover:text-[#FBCF41] flex items-center"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <motion.div 
+                                className="flex items-center w-full"
+                                variants={dropdownItemHover}
+                              >
+                                <FileText className="h-4 w-4 mr-2" /> Registration
                               </motion.div>
                             </Link>
                           </motion.div>
