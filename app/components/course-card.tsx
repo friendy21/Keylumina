@@ -33,7 +33,7 @@ export function CourseCard({
       >
         <div className="p-5 flex flex-col h-full">
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-1">{title}</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-1">{title}</h3>
             <p className="text-gray-700 text-left">{duration}</p>
             <p className="text-sm text-gray-700">{levels}</p>
           </div>
