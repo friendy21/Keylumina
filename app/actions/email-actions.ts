@@ -119,7 +119,7 @@ export async function submitEmailForm(formData: FormData) {
 
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
-      to: "friendykaliman@gmail.com",
+      to: "whiteleakerfredy@gmail.com",
       subject: `[Keylumina Website] ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -173,7 +173,7 @@ export async function submitPhoneForm(formData: FormData) {
 
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
-      to: "friendykaliman@gmail.com",
+      to: "whiteleakerfredy@gmail.com",
       subject: `[Keylumina Website] WhatsApp Request`,
       html: `
         <h2>New WhatsApp Contact Request</h2>
@@ -225,7 +225,7 @@ export async function submitSocialForm(formData: FormData) {
 
     await resend.emails.send({
       from: "Keylumina Contact <noreply@yourdomain.com>",
-      to: "friendykaliman@gmail.com",
+      to: "whiteleakerfredy@gmail.com",
       subject: `[Keylumina Website] ${socialPlatform.charAt(0).toUpperCase() + socialPlatform.slice(1)} Request`,
       html: `
         <h2>New Social Media Contact Request</h2>
@@ -243,4 +243,3 @@ export async function submitSocialForm(formData: FormData) {
     return { success: false, message: "An error occurred. Please try again later." }
   }
 }
-
