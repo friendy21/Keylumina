@@ -13,7 +13,7 @@ console.log("ENV Check:", {
 });
 
 // Web3Forms API key - get a free key from https://web3forms.com/
-const WEB3FORMS_API_KEY = process.env.WEB3FORMS_API_KEY || "4ee8ac06-7cfe-4a46-8637-b44dbd3190b4";
+const WEB3FORMS_API_KEY = process.env.WEB3FORMS_API_KEY;
 
 // Recipient email address
 const RECIPIENT_EMAIL = "novijingga.keylumina@gmail.com";
