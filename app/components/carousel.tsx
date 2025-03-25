@@ -40,9 +40,10 @@ export function Carousel({ courses }: CarouselProps) {
     setCurrentIndex(totalCourses)
   }, [totalCourses])
 
-  // Handle responsive layout
+  // Handle responsive layout with improved card width calculation
   useEffect(() => {
     const handleResize = () => {
+      // Adjust visible cards based on screen width
       if (window.innerWidth < 640) {
         setVisibleCards(1)
       } else if (window.innerWidth < 1024) {
@@ -188,7 +189,7 @@ export function Carousel({ courses }: CarouselProps) {
   }
 
   // Pagination dots - fixed at 6 
-  const paginationDotsCount = 6
+  const paginationDotsCount = Math.min(6, totalCourses)
 
   // Get active dot based on currentIndex
   const getActiveDotIndex = () => {
@@ -239,9 +240,13 @@ export function Carousel({ courses }: CarouselProps) {
               className="flex-none px-2"
               style={{
                 width: `${100 / visibleCards}%`,
+                // Ensure minimum width on small screens
+                minWidth: visibleCards === 1 ? '280px' : 'auto',
+                // Add padding to prevent clipping of discount tag
+                paddingRight: '16px',
               }}
             >
-              <Link href={`/courses/${course.id}`}>
+              <Link href={`/courses/${course.id}`} className="block h-full">
                 <CourseCard
                   id={course.id}
                   title={course.title}
