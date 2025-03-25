@@ -219,28 +219,29 @@ function CourseCard({
             <p className="text-sm font-medium text-gray-700 line-clamp-3">{description}</p>
           </div>
 
-          <div className="bg-[#FBCF41] rounded-lg h-[200px] mb-4 relative overflow-hidden">
-            <div className="w-full h-full relative">
-              {imageLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#FBCF41] z-10">
-                  <div className="w-10 h-10 border-4 border-white border-t-[#660099] rounded-full animate-spin"></div>
-                </div>
-              )}
-              
-              <Image
-                src={imageError ? "/placeholder.svg" : (image || "/placeholder.svg")}
-                alt={title}
-                fill
-                className={`object-cover rounded transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
-                placeholder="blur"
-                blurDataURL={placeholderSrc}
-                onLoadingComplete={() => setImageLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setImageLoading(false);
-                }}
-              />
-            </div>
+          {/* Updated image container for responsive sizing */}
+          <div className="bg-[#FBCF41] rounded-lg w-full mb-4 relative overflow-hidden aspect-video">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[#FBCF41] z-10">
+                <div className="w-10 h-10 border-4 border-white border-t-[#660099] rounded-full animate-spin"></div>
+              </div>
+            )}
+            
+            <Image
+              src={imageError ? "/placeholder.svg" : (image || "/placeholder.svg")}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              className={`object-cover rounded transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+              placeholder="blur"
+              blurDataURL={placeholderSrc}
+              onLoadingComplete={() => setImageLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setImageLoading(false);
+              }}
+              priority={index < 3} // Prioritize loading the first 3 images
+            />
           </div>
 
           {showButton && (
