@@ -26,10 +26,10 @@ export function CourseCard({
   showButton = true,
 }: CourseCardProps) {
   return (
-    <div className="w-full px-4">
+    <div className="w-full px-3">
       <div
         key={id}
-        className="bg-white rounded-lg overflow-hidden shadow-lg mx-auto transition-transform hover:scale-105 cursor-pointer h-[480px] flex flex-col"
+        className="bg-white rounded-lg overflow-hidden shadow-lg mx-auto transition-transform hover:scale-105 cursor-pointer h-[480px] flex flex-col w-full"
       >
         <div className="p-5 flex flex-col h-full">
           <div className="mb-4">
