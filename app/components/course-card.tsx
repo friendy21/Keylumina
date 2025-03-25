@@ -25,11 +25,14 @@ export function CourseCard({
   image,
   showButton = true,
 }: CourseCardProps) {
+  // Check if the tag represents a discount or special offer
+  const isDiscount = tag?.includes('%') || tag?.toLowerCase().includes('off') || tag?.includes('Rp');
+
   return (
-    <div className="w-full px-3">
+    <div className="h-full w-full">
       <div
         key={id}
-        className="bg-white rounded-lg overflow-hidden shadow-lg mx-auto transition-transform hover:scale-105 cursor-pointer h-[480px] flex flex-col w-full"
+        className="bg-white rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 cursor-pointer flex flex-col w-full h-full"
       >
         <div className="p-5 flex flex-col h-full">
           <div className="mb-4">
@@ -42,15 +45,16 @@ export function CourseCard({
             <p className="text-sm font-medium text-gray-700 line-clamp-3">{description}</p>
           </div>
 
-          <div className="bg-[#FBCF41] rounded-lg h-[200px] mb-4">
-            <div className="w-full h-full relative">
-              <Image
-                src={image || "/placeholder.svg"}
-                alt={title}
-                fill
-                className="object-cover rounded"
-              />
-            </div>
+          {/* Image container with responsive sizing */}
+          <div className="relative bg-[#FBCF41] rounded-lg w-full mb-4 overflow-hidden aspect-video">
+            <Image
+              src={image || "/placeholder.svg"}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              className="object-cover rounded"
+              priority
+            />
           </div>
 
           {showButton && (
