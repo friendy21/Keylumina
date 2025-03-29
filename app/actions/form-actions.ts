@@ -155,9 +155,9 @@ export async function submitEmailForm(formData: FormData) {
     console.log("Received CSRF token:", csrfToken);
     
     // Skip CSRF verification for now to debug other issues
-    // if (!verifyCsrfToken(csrfToken)) {
-    //   return { success: false, message: "Invalid request. Please try again." };
-    // }
+    if (!verifyCsrfToken(csrfToken)) {
+    return { success: false, message: "Invalid request. Please try again." };
+    }
 
     // Parse and validate form data
     const data = {
