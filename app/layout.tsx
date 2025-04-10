@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "KeyLumina Media School",
-  description: "Learn motion design and CG from zero to pro",
+  description: "We aim to guide you in mastering basic of designs, software tools, and supporting skills such as making timeline, positive habit, and more.",
   icons: {
     icon: '/KMS_logo_web.png',
   }
