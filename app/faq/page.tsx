@@ -300,7 +300,7 @@ export default function FAQPage() {
     },
     {
       question: "Where is the Offline Class located?",
-      answer: "Our Offline class is located near ITC Roxy Square, Central Jakarta. But if many students are located in other location, we will consider opening a class there.",
+      answer: "Our Offline class is located near ITC Roxy Mas, Central Jakarta. But if many students are located in other location, we will consider opening a class there.",
     },
     {
       question: "Should I bring my laptop to Offline Class?",
